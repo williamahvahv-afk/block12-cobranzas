@@ -1,0 +1,1301 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>BLOCK 12 · Control de Cobranzas (Feb–Jun 2026)</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#111a2e;
+      --muted:#9fb0d0;
+      --text:#e8eefc;
+      --line:rgba(255,255,255,.10);
+      --ok:#1dd1a1;
+      --warn:#feca57;
+      --bad:#ff6b6b;
+      --accent:#4aa3ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 10% 0%, #13234a 0%, var(--bg) 55%, #070b14 100%);
+      color:var(--text);
+    }
+    header{
+      padding:18px 18px 10px;
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      background: rgba(11,18,32,.92);
+      backdrop-filter: blur(10px);
+      z-index:10;
+    }
+    h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.3px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .tag{
+      font-size:12px;
+      padding:4px 8px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      color:var(--muted);
+      background: rgba(255,255,255,.04);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:16px;}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:12px;
+      align-items:start;
+    }
+    @media (max-width: 1020px){
+      .grid{grid-template-columns: 1fr;}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.25);
+    }
+    .card h2{
+      margin:0 0 10px;
+      font-size:14px;
+      color: #d9e3ff;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+    .field{display:flex;flex-direction:column;gap:6px;min-width:160px;flex:1}
+    label{font-size:12px;color:var(--muted)}
+    input, select, textarea{
+      background: rgba(0,0,0,.22);
+      border:1px solid var(--line);
+      color:var(--text);
+      padding:9px 10px;
+      border-radius:10px;
+      outline:none;
+      font-size:13px;
+    }
+    textarea{min-height:72px;resize:vertical}
+    input:focus, select:focus, textarea:focus{border-color: rgba(74,163,255,.7); box-shadow: 0 0 0 3px rgba(74,163,255,.18)}
+    .btns{display:flex;gap:8px;flex-wrap:wrap}
+    button{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      color:var(--text);
+      padding:9px 11px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:12.5px;
+    }
+    button:hover{border-color: rgba(255,255,255,.25)}
+    button.primary{background: linear-gradient(180deg, rgba(74,163,255,.35), rgba(74,163,255,.12)); border-color: rgba(74,163,255,.55)}
+    button.danger{background: linear-gradient(180deg, rgba(255,107,107,.25), rgba(255,107,107,.10)); border-color: rgba(255,107,107,.5)}
+    button.ghost{background: transparent}
+    .mini{font-size:11px;color:var(--muted)}
+    table{
+      width:100%;
+      border-collapse: collapse;
+      font-size:12.5px;
+      overflow:hidden;
+      border-radius:12px;
+    }
+    thead th{
+      text-align:left;
+      padding:10px 8px;
+      border-bottom:1px solid var(--line);
+      color:#cfe0ff;
+      background: rgba(0,0,0,.18);
+      position:sticky;
+      top:74px;
+      z-index:5;
+    }
+    tbody td{
+      padding:8px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      vertical-align:top;
+    }
+    tbody tr:hover{background: rgba(255,255,255,.03)}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:3px 9px;
+      border-radius:999px;
+      font-size:11px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      white-space:nowrap;
+    }
+    .dot{width:8px;height:8px;border-radius:50%}
+    .ok{background:var(--ok)}
+    .warn{background:var(--warn)}
+    .bad{background:var(--bad)}
+    .right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .kpi{flex:1; min-width:150px; padding:10px;border:1px dashed rgba(255,255,255,.12);border-radius:12px;background: rgba(0,0,0,.14)}
+    .kpi b{display:block;font-size:18px}
+    .kpi span{font-size:12px;color:var(--muted)}
+    .split{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width:700px){.split{grid-template-columns:1fr}}
+    .sep{height:1px;background:var(--line);margin:10px 0}
+    .note{
+      padding:10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      border-radius:12px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .small{font-size:12px}
+    .muted{color:var(--muted)}
+    .nowrap{white-space:nowrap}
+    .w110{width:110px}
+    .w130{width:130px}
+    .w160{width:160px}
+    .hidden{display:none !important}
+
+    /* Vista móvil: filas tipo tarjeta */
+    @media (max-width: 680px){
+      thead{display:none;}
+      table{border-radius:0}
+      tbody tr{
+        display:block;
+        border:1px solid var(--line);
+        border-radius:14px;
+        margin:10px 0;
+        padding:8px 10px;
+        background: rgba(0,0,0,.14);
+      }
+      tbody td{
+        display:block;
+        width:100%;
+        border:0;
+        padding:8px 2px;
+      }
+      tbody td::before{
+        content: attr(data-label);
+        display:block;
+        font-size:11px;
+        color:var(--muted);
+        margin:0 0 5px;
+      }
+      tbody td.selCell{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:6px 2px;
+      }
+      tbody td.selCell::before{display:none;}
+      input, select, textarea{width:100%;}
+      .w110,.w130,.w160{width:100%;}
+    }
+
+    @media print{
+      body{background:#fff;color:#000}
+      header, .no-print{display:none !important}
+      .wrap{max-width:none;padding:0}
+      .card{box-shadow:none;border:0;background:#fff;border-radius:0}
+      table{font-size:10.5px}
+      thead th{position:static;background:#f4f6fb;color:#000;border-bottom:1px solid #ccc}
+      tbody td{border-bottom:1px solid #eee}
+      .pill{border:1px solid #bbb;background:#fff;color:#000}
+      .note{border:1px solid #ddd;background:#fff}
+      .kpi{border:1px solid #ddd;background:#fff}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>
+      BLOCK 12 · Control de Cobranzas
+      <span class="tag">20 dptos · 4 por piso</span>
+      <span class="tag" id="tagMes">Mes: —</span>
+      <span class="tag" id="tagGuardado">Sin guardar</span>
+      <span class="tag" id="tagBackup">Backup: —</span>
+    </h1>
+    <div class="row" style="margin-top:10px">
+      <div class="field" style="max-width:280px;flex:0 0 280px">
+        <label>Mes de trabajo</label>
+        <select id="mesSel"></select>
+      </div>
+      <div class="field" style="max-width:210px;flex:0 0 210px">
+        <label>Fecha límite del mes (cierre)</label>
+        <input id="fechaLimite" type="date"/>
+      </div>
+      <div class="field" style="max-width:180px;flex:0 0 180px">
+        <label>Cuota base por dpto (S/.)</label>
+        <input id="cuotaBase" type="number" min="0" step="0.01"/>
+      </div>
+      <div class="field" style="max-width:220px;flex:0 0 220px">
+        <label>N° PLIN (cobro)</label>
+        <input id="plin" placeholder="Ej: 978515968"/>
+      </div>
+      <div class="field" style="max-width:260px;flex:0 0 260px">
+        <label>Titular</label>
+        <input id="titular" placeholder="Ej: William Huatay Villoslada"/>
+      </div>
+      <div class="btns">
+        <button class="primary" id="btnGuardar">Guardar</button>
+        <button id="btnExportPDF">Exportar PDF</button>
+        <button id="btnExportCSV">Exportar CSV</button>
+        <button id="btnBackup">Backup JSON</button>
+        <button id="btnImport">Importar JSON</button>
+        <button id="btnCopyCode">Copiar código respaldo</button>
+        <button id="btnRestoreCode" class="ghost">Restaurar código</button>
+        <input id="fileImport" class="hidden" type="file" accept="application/json"/>
+        <button class="danger" id="btnResetMes">Reset mes</button>
+      </div>
+    </div>
+    <div class="mini" style="margin-top:8px">
+      ✅ Se guarda automáticamente en este dispositivo (navegador).
+      <b>Para no perder nada al cambiar de equipo</b>, haz <b>Backup JSON</b> (y súbelo a Drive/OneDrive) o copia el <b>código de respaldo</b> en WhatsApp (“Mensajes guardados”).
+    </div>
+
+    <div class="row no-print" style="margin-top:6px; align-items:center; gap:8px; flex-wrap:wrap">
+      <button id="btnConnectFile" title="Conecta un archivo .json (si tu navegador lo permite)">Modo seguro: Conectar archivo</button>
+      <button id="btnSaveFile" class="ghost" title="Fuerza el guardado inmediato al archivo conectado">Guardar en archivo ahora</button>
+      <button id="btnDisconnectFile" class="ghost" title="Desconecta el archivo (no borra nada)">Desconectar</button>
+      <span class="tag" id="tagArchivo">Archivo: no conectado</span>
+    </div>
+    <div class="mini" id="fileSupport" style="margin-top:6px"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <div class="card">
+      <h2>Cobranzas por departamento <span class="mini no-print" id="miniFiltro"></span></h2>
+
+      <div class="row no-print">
+        <div class="field" style="max-width:200px;flex:0 0 200px">
+          <label>Filtrar por piso</label>
+          <select id="filtroPiso">
+            <option value="">Todos</option>
+            <option value="1">Piso 1</option>
+            <option value="2">Piso 2</option>
+            <option value="3">Piso 3</option>
+            <option value="4">Piso 4</option>
+            <option value="5">Piso 5</option>
+          </select>
+        </div>
+        <div class="field" style="max-width:220px;flex:0 0 220px">
+          <label>Filtrar por estado</label>
+          <select id="filtroEstado">
+            <option value="">Todos</option>
+            <option value="PAGADO">Pagado</option>
+            <option value="PARCIAL">Parcial</option>
+            <option value="PENDIENTE">Pendiente</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:260px;flex:1">
+          <label>Buscar (dpto / propietario)</label>
+          <input id="buscar" placeholder="Ej: 304 o CANAZAS"/>
+        </div>
+        <div class="btns">
+          <button id="btnAplicarCuota">Aplicar cuota base a todos</button>
+          <button id="btnMarcarHoy">Marcar Pagado (hoy) a seleccionado</button>
+        </div>
+      </div>
+
+      <div class="sep no-print"></div>
+
+      <div class="note no-print">
+        <b>Estado automático:</b>
+        <span class="pill"><span class="dot ok"></span>Pagado</span> si Pagado ≥ Monto,
+        <span class="pill"><span class="dot warn"></span>Parcial</span> si 0 &lt; Pagado &lt; Monto, y
+        <span class="pill"><span class="dot bad"></span>Pendiente</span> si Pagado = 0.
+      </div>
+
+      <div style="overflow:auto; margin-top:10px">
+        <table id="tabla">
+          <thead>
+            <tr>
+              <th class="nowrap">Sel</th>
+              <th class="nowrap">Piso</th>
+              <th class="nowrap">Dpto</th>
+              <th>Propietario</th>
+              <th class="nowrap">Monto (S/.)</th>
+              <th class="nowrap">Pagado (S/.)</th>
+              <th class="nowrap">Estado</th>
+              <th class="nowrap">Fecha pago</th>
+              <th class="nowrap">Medio</th>
+              <th class="nowrap">N° operación</th>
+              <th>Nota</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Resumen del mes <span class="mini" id="miniFecha"></span></h2>
+
+      <div class="right">
+        <div class="kpi">
+          <b id="kpiRecaudado">S/ 0.00</b>
+          <span>Recaudado</span>
+        </div>
+        <div class="kpi">
+          <b id="kpiTotal">S/ 0.00</b>
+          <span>Total a cobrar</span>
+        </div>
+        <div class="kpi">
+          <b id="kpiAvance">0%</b>
+          <span>Avance</span>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="split">
+        <div class="note">
+          <b>Semáforo por piso</b>
+          <div id="semPisos" style="margin-top:8px"></div>
+          <div class="mini" style="margin-top:8px">🟢 4/4 · 🟡 3/4 · 🔴 0–2/4</div>
+        </div>
+        <div class="note">
+          <b>Pendientes</b>
+          <div id="pendientes" style="margin-top:8px"></div>
+          <div class="sep"></div>
+          <b>Ranking de morosidad</b>
+          <div id="ranking" style="margin-top:8px"></div>
+          <div class="sep"></div>
+          <b>Mensaje WhatsApp</b>
+          <textarea id="msgWsp" readonly></textarea>
+        <div class="row no-print" style="margin-top:8px">
+            <div class="btns">
+              <button id="btnCopyWsp">Copiar mensaje</button>
+              <button id="btnCopyPend">Copiar pendientes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="note">
+        <b>Gastos del mes (opcional, calcula cuota)</b>
+        <div class="mini">Si llenas gastos, cuota = Total/20. Igual puedes usar “Cuota base” manual.</div>
+        <div style="overflow:auto;margin-top:10px">
+          <table>
+            <thead>
+              <tr>
+                <th>Concepto</th>
+                <th class="nowrap">Monto (S/.)</th>
+                <th class="nowrap">Vencimiento</th>
+                <th class="nowrap no-print">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyGastos"></tbody>
+          </table>
+        </div>
+        <div class="row no-print" style="margin-top:10px">
+          <div class="btns">
+            <button id="btnAddGasto">+ Agregar gasto</button>
+            <button id="btnCalcCuota">Calcular cuota desde gastos</button>
+          </div>
+          <div class="field" style="max-width:240px;flex:0 0 240px">
+            <label>Total gastos (S/.)</label>
+            <input id="totalGastos" readonly/>
+          </div>
+          <div class="field" style="max-width:240px;flex:0 0 240px">
+            <label>Cuota calculada (S/.)</label>
+            <input id="cuotaCalc" readonly/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="printArea">
+    <h2 style="margin:0 0 6px">BLOCK 12 · Reporte de Cobranzas</h2>
+    <div class="small muted" id="printSub"></div>
+    <div class="sep"></div>
+
+    <div class="split">
+      <div class="kpi"><b id="pRecaudado">S/ 0.00</b><span>Recaudado</span></div>
+      <div class="kpi"><b id="pTotal">S/ 0.00</b><span>Total a cobrar</span></div>
+    </div>
+    <div class="split" style="margin-top:10px">
+      <div class="kpi"><b id="pAvance">0%</b><span>Avance</span></div>
+      <div class="kpi"><b id="pPend">0</b><span>Dptos pendientes</span></div>
+    </div>
+
+    <div class="sep"></div>
+    <div class="note"><b>Datos de cobro:</b> PLIN <span id="pPlin"></span> · Titular: <span id="pTitular"></span> · Fecha límite: <span id="pLim"></span></div>
+
+    <div class="sep"></div>
+    <div class="note"><b>Semáforo por piso</b><div id="pSem"></div></div>
+
+    <div class="sep"></div>
+    <div class="note"><b>Pendientes (solo dpto)</b><div id="pPendList"></div></div>
+
+    <div class="sep"></div>
+    <div style="overflow:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Piso</th><th>Dpto</th><th>Propietario</th><th>Monto</th><th>Pagado</th><th>Estado</th><th>Fecha pago</th><th>Medio</th><th>Operación</th><th>Nota</th>
+          </tr>
+        </thead>
+        <tbody id="pTable"></tbody>
+      </table>
+    </div>
+
+    <div class="sep"></div>
+    <div class="small muted" id="pFoot"></div>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  const STORAGE_KEY = "block12_cobranzas_v1";
+  const MONTHS = [
+    {key:"2026-02", name:"Febrero 2026"},
+    {key:"2026-03", name:"Marzo 2026"},
+    {key:"2026-04", name:"Abril 2026"},
+    {key:"2026-05", name:"Mayo 2026"},
+    {key:"2026-06", name:"Junio 2026"},
+  ];
+
+  const DEFAULT_DEPTS = [
+    {piso:1,dpto:"101",owner:"COAPAZA COAPAZA David (Rosario Vda de Coapaza)"},
+    {piso:1,dpto:"102",owner:"TUÑOQUE SANTA MARIA Lucas"},
+    {piso:1,dpto:"103",owner:"CALDERON VEGA Segundo"},
+    {piso:1,dpto:"104",owner:"ESPINOZA RAMOS Pío"},
+    {piso:2,dpto:"201",owner:"CAMPOS FLORES María"},
+    {piso:2,dpto:"202",owner:"DEL VALLE MENDOZA Martín"},
+    {piso:2,dpto:"203",owner:"RAMIREZ ALVARADO Manuel (Sra Dalia)"},
+    {piso:2,dpto:"204",owner:"MIRANDA Nilo"},
+    {piso:3,dpto:"301",owner:"ROJAS BARRIOS Juver (Sra Esther)"},
+    {piso:3,dpto:"302",owner:"PLACIDO FABIAN Jhony"},
+    {piso:3,dpto:"303",owner:"CANAZAS CRUZ Honorato"},
+    {piso:3,dpto:"304",owner:"PASTOR VARGAS Raúl"},
+    {piso:4,dpto:"401",owner:"QUISPE CAÑAZA Mauro (Sr. Sánchez)"},
+    {piso:4,dpto:"402",owner:"AUCAHUAQUI SICCOS Gregori"},
+    {piso:4,dpto:"403",owner:"VENERO RODRIGUEZ Eovidio"},
+    {piso:4,dpto:"404",owner:"ADUVIRE CAUSA León"},
+    {piso:5,dpto:"501",owner:"NOVOA SANTI Lino"},
+    {piso:5,dpto:"502",owner:"ANGELES MASLUCAN Freddy"},
+    {piso:5,dpto:"503",owner:"CHAUPIS LAGUNA Moisés"},
+    {piso:5,dpto:"504",owner:"HUATAY VILLOSLADA William"},
+  ];
+
+  const $ = (id) => document.getElementById(id);
+
+  const state = { data:null, currentMonth:"2026-02", selectedDpto:null, dirty:false, fileHandle:null, fileHandleName:"", fileSavePending:false, fileSaveInProgress:false };
+
+  function nowISODate(){
+    const d = new Date();
+    const tzOff = d.getTimezoneOffset()*60000;
+    return new Date(d - tzOff).toISOString().slice(0,10);
+  }
+  function round2(n){ return Math.round((Number(n||0)+Number.EPSILON)*100)/100; }
+  function fmtMoney(n){ return "S/ " + Number(n||0).toFixed(2); }
+  function pct(n){ return Math.round((isFinite(n)?n:0)*100) + "%"; }
+
+  // ===== Respaldo para cambiar de equipo (recomendado) =====
+  const BACKUP_META_KEY = "block12_last_backup_v1";
+
+  function setBackupTag(){
+    const raw = localStorage.getItem(BACKUP_META_KEY);
+    if (!raw){ $("tagBackup").textContent = "Backup: —"; return; }
+    try{
+      const obj = JSON.parse(raw);
+      const t = obj?.time ? new Date(obj.time) : null;
+      const hh = t ? String(t.getHours()).padStart(2,"0") : "--";
+      const mm = t ? String(t.getMinutes()).padStart(2,"0") : "--";
+      const dd = t ? String(t.getDate()).padStart(2,"0") : "--";
+      const mo = t ? String(t.getMonth()+1).padStart(2,"0") : "--";
+      $("tagBackup").textContent = `Backup: ${dd}/${mo} ${hh}:${mm}${obj?.kind ? " · " + obj.kind : ""}`;
+    }catch(e){
+      $("tagBackup").textContent = "Backup: —";
+    }
+  }
+
+  function markBackedUp(kind){
+    localStorage.setItem(BACKUP_META_KEY, JSON.stringify({time:new Date().toISOString(), kind: kind||""}));
+    setBackupTag();
+  }
+
+  // Código de respaldo (base64) para pegar en WhatsApp/Correo y restaurar en otro equipo.
+  function encodeUTF8Base64(str){
+    // btoa solo acepta Latin1; este truco convierte UTF-8 correctamente
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function decodeUTF8Base64(b64){
+    return decodeURIComponent(escape(atob(b64)));
+  }
+  function makeBackupCode(){
+    const payload = JSON.stringify(state.data);
+    return "B12v1:" + encodeUTF8Base64(payload);
+  }
+  function restoreFromBackupCode(code){
+    const c = String(code||"").trim();
+    if (!c.startsWith("B12v1:")) throw new Error("Código inválido (prefijo).");
+    const jsonStr = decodeUTF8Base64(c.slice(5));
+    const obj = JSON.parse(jsonStr);
+    if (!obj || !obj.depts || !obj.months || !obj.pagos) throw new Error("Contenido inválido.");
+    state.data = obj;
+    for (const m of MONTHS) initMonth(m.key);
+    markDirty(); save(true); renderAll();
+    markBackedUp("Código");
+  }
+
+  // ===== Modo seguro (archivo) – solo si el navegador lo permite =====
+  const IDB_NAME = "block12_cobranzas_secure_v1";
+  const IDB_STORE = "kv";
+
+  function fileModeSupported(){
+    return ("showSaveFilePicker" in window) && ("indexedDB" in window);
+  }
+
+  function setFileTag(text){
+    const el = $("tagArchivo");
+    if (el) el.textContent = text;
+  }
+  function setFileSupportText(text){
+    const el = $("fileSupport");
+    if (el) el.textContent = text;
+  }
+
+  function idbOpen(){
+    return new Promise((resolve,reject)=>{
+      const req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = () => { req.result.createObjectStore(IDB_STORE); };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbGet(key){
+    const db = await idbOpen();
+    return new Promise((resolve,reject)=>{
+      const tx = db.transaction(IDB_STORE, "readonly");
+      const st = tx.objectStore(IDB_STORE);
+      const r = st.get(key);
+      r.onsuccess = () => resolve(r.result);
+      r.onerror = () => reject(r.error);
+    });
+  }
+  async function idbSet(key, val){
+    const db = await idbOpen();
+    return new Promise((resolve,reject)=>{
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      tx.objectStore(IDB_STORE).put(val, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function idbDel(key){
+    const db = await idbOpen();
+    return new Promise((resolve,reject)=>{
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      tx.objectStore(IDB_STORE).delete(key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  async function loadFileHandle(){
+    if (!fileModeSupported()){
+      setFileSupportText("Modo seguro por archivo: no disponible en este navegador. Usa “Backup JSON” o “Copiar código respaldo” y guárdalo en Drive/WhatsApp.");
+      setFileTag("Archivo: no disponible");
+      return;
+    }
+    setFileSupportText("Modo seguro por archivo: conecta un .json y se guardará automáticamente también allí (ideal si lo pones en Drive/OneDrive).");
+    try{
+      const h = await idbGet("fileHandle");
+      const name = await idbGet("fileHandleName");
+      if (h){
+        state.fileHandle = h;
+        state.fileHandleName = name || h.name || "block12_cobranzas.json";
+        setFileTag("Archivo: conectado (" + state.fileHandleName + ")");
+      } else {
+        setFileTag("Archivo: no conectado");
+      }
+    }catch(e){
+      setFileTag("Archivo: no conectado");
+    }
+  }
+
+  async function writeConnectedFile(){
+    if (!state.fileHandle) return false;
+    try{
+      // Permisos (si el navegador pide)
+      if (state.fileHandle.queryPermission){
+        let perm = await state.fileHandle.queryPermission({mode:"readwrite"});
+        if (perm !== "granted"){
+          perm = await state.fileHandle.requestPermission({mode:"readwrite"});
+          if (perm !== "granted") return false;
+        }
+      }
+      const writable = await state.fileHandle.createWritable();
+      await writable.write(JSON.stringify(state.data, null, 2));
+      await writable.close();
+      const t = new Date();
+      const hh = String(t.getHours()).padStart(2,"0");
+      const mm = String(t.getMinutes()).padStart(2,"0");
+      const ss = String(t.getSeconds()).padStart(2,"0");
+      setFileTag(`Archivo: ${state.fileHandleName || "conectado"} · OK ${hh}:${mm}:${ss}`);
+      return true;
+    }catch(e){
+      setFileTag("Archivo: error al guardar");
+      return false;
+    }
+  }
+
+  function scheduleFileWrite(){
+    if (!state.fileHandle) return;
+    state.fileSavePending = true;
+    if (state.fileSaveInProgress) return;
+    state.fileSaveInProgress = true;
+    (async()=>{
+      while(state.fileSavePending){
+        state.fileSavePending = false;
+        await writeConnectedFile();
+      }
+      state.fileSaveInProgress = false;
+    })();
+  }
+
+  async function connectFile(){
+    if (!fileModeSupported()){
+      alert("Tu navegador no permite conectar un archivo. Usa “Backup JSON” o “Copiar código respaldo”.");
+      return;
+    }
+    try{
+      const suggested = `block12_cobranzas_${state.currentMonth}.json`;
+      const handle = await window.showSaveFilePicker({
+        suggestedName: suggested,
+        types: [{ description: "JSON", accept: {"application/json":[".json"]} }]
+      });
+      state.fileHandle = handle;
+      state.fileHandleName = handle.name || suggested;
+      await idbSet("fileHandle", handle);
+      await idbSet("fileHandleName", state.fileHandleName);
+      setFileTag("Archivo: conectado (" + state.fileHandleName + ")");
+      await writeConnectedFile();
+      alert("Archivo conectado. Desde ahora se guardará automáticamente también en ese archivo.");
+      markBackedUp("Archivo");
+    }catch(e){
+      if (e && e.name === "AbortError") return;
+      alert("No se pudo conectar el archivo: " + (e.message || e));
+    }
+  }
+
+  async function disconnectFile(){
+    state.fileHandle = null;
+    state.fileHandleName = "";
+    try{ await idbDel("fileHandle"); await idbDel("fileHandleName"); }catch(e){}
+    setFileTag("Archivo: no conectado");
+  }
+
+
+  function freshData(){
+    const d = {
+      meta:{version:1, createdAt:new Date().toISOString()},
+      settings:{ plin:"978515968", titular:"William Huatay Villoslada", numDepts:20 },
+      depts: DEFAULT_DEPTS,
+      months:{},
+      pagos:{}
+    };
+    for (const m of MONTHS) initMonth(m.key, d);
+    return d;
+  }
+
+  function initMonth(monthKey, d){
+    const data = d || state.data;
+    if (!data.months[monthKey]) data.months[monthKey] = {fechaLimite:"", cuotaBase:0, gastos:[]};
+    if (!data.pagos[monthKey]){
+      data.pagos[monthKey] = {};
+      for (const dep of data.depts){
+        data.pagos[monthKey][dep.dpto] = {due:0, paid:0, date:"", method:"PLIN", op:"", note:""};
+      }
+    } else {
+      for (const dep of data.depts){
+        if (!data.pagos[monthKey][dep.dpto]) data.pagos[monthKey][dep.dpto] = {due:0, paid:0, date:"", method:"PLIN", op:"", note:""};
+      }
+    }
+  }
+
+  function seedFeb(){
+    const m = "2026-02";
+    const md = state.data.months[m];
+    md.fechaLimite = "2026-02-20";
+    md.gastos = [
+      {concepto:"Servicio de Agua", monto:1434.80, venc:"2026-03-02"},
+      {concepto:"Servicio de Luz", monto:61.60, venc:"2026-02-20"},
+      {concepto:"Seguridad", monto:600.00, venc:""},
+      {concepto:"Limpieza", monto:200.00, venc:""},
+    ];
+    const total = md.gastos.reduce((a,g)=>a+Number(g.monto||0),0);
+    const cuota = round2(total / state.data.settings.numDepts); // 114.82
+    md.cuotaBase = cuota;
+    for (const dep of state.data.depts){
+      state.data.pagos[m][dep.dpto].due = cuota;
+      state.data.pagos[m][dep.dpto].method = "PLIN";
+    }
+  }
+
+  function load(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw){
+      state.data = freshData();
+      seedFeb();
+      save(true);
+      return;
+    }
+    try{
+      state.data = JSON.parse(raw);
+      if (!state.data || !state.data.depts) throw new Error("bad");
+      for (const m of MONTHS) initMonth(m.key);
+    }catch(e){
+      state.data = freshData();
+      seedFeb();
+      save(true);
+    }
+  }
+
+  function save(silent=false){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+    scheduleFileWrite();
+    state.dirty = false;
+    const t = new Date();
+    const hh = String(t.getHours()).padStart(2,"0");
+    const mm = String(t.getMinutes()).padStart(2,"0");
+    const ss = String(t.getSeconds()).padStart(2,"0");
+    $("tagGuardado").textContent = (silent ? "Auto-guardado " : "Guardado ") + `${hh}:${mm}:${ss}`;
+  }
+  let saveTimer=null;
+  function markDirty(){
+    state.dirty = true;
+    $("tagGuardado").textContent = "Cambios sin guardar";
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>save(true), 600);
+  }
+
+  function monthName(key){
+    return (MONTHS.find(x=>x.key===key)||{name:key}).name;
+  }
+  function formatDateShort(iso){
+    if (!iso) return "(sin fecha)";
+    if (iso.includes("-")){
+      const [y,m,d]=iso.split("-");
+      return `${d}/${m}/${y}`;
+    }
+    return iso;
+  }
+
+  function getMonthData(){ return state.data.months[state.currentMonth]; }
+  function getMonthPagos(){ return state.data.pagos[state.currentMonth]; }
+
+  function computeStatus(p){
+    const due = Number(p.due||0);
+    const paid = Number(p.paid||0);
+    if (paid >= due && due>0) return "PAGADO";
+    if (paid > 0 && paid < due) return "PARCIAL";
+    return "PENDIENTE";
+  }
+  function statusPill(st){
+    if (st==="PAGADO") return '<span class="pill"><span class="dot ok"></span>Pagado</span>';
+    if (st==="PARCIAL") return '<span class="pill"><span class="dot warn"></span>Parcial</span>';
+    return '<span class="pill"><span class="dot bad"></span>Pendiente</span>';
+  }
+
+  function setupMonthSelector(){
+    const sel = $("mesSel");
+    sel.innerHTML = "";
+    for (const m of MONTHS){
+      const opt = document.createElement("option");
+      opt.value = m.key;
+      opt.textContent = m.name;
+      sel.appendChild(opt);
+    }
+    sel.value = state.currentMonth;
+    sel.addEventListener("change", ()=>{ state.currentMonth = sel.value; renderAll(); });
+  }
+
+  function renderHeader(){
+    $("tagMes").textContent = "Mes: " + monthName(state.currentMonth);
+    const md = getMonthData();
+    $("fechaLimite").value = md.fechaLimite || "";
+    $("cuotaBase").value = Number(md.cuotaBase||0).toFixed(2);
+    $("plin").value = state.data.settings.plin || "";
+    $("titular").value = state.data.settings.titular || "";
+  }
+
+  function escapeAttr(s){
+    return String(s||"").replaceAll("&","&amp;").replaceAll('"',"&quot;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+  }
+
+  function optMethod(value, current){
+    const cur = String(current||"PLIN").toUpperCase();
+    const sel = cur===value ? "selected":"";
+    const label = value==="PLIN" ? "PLIN" : value==="TRANSFERENCIA" ? "Transferencia" : value==="EFECTIVO" ? "Efectivo" : "Otro";
+    return `<option value="${value}" ${sel}>${label}</option>`;
+  }
+
+  function renderTable(){
+    const tbody = $("tbody");
+    tbody.innerHTML = "";
+    const fp = $("filtroPiso").value;
+    const fe = $("filtroEstado").value;
+    const q = ($("buscar").value||"").trim().toUpperCase();
+    let shown=0;
+
+    for (const dep of state.data.depts){
+      const p = getMonthPagos()[dep.dpto];
+      const st = computeStatus(p);
+      if (fp && String(dep.piso)!==String(fp)) continue;
+      if (fe && st!==fe) continue;
+      if (q){
+        const hay = (dep.dpto+" "+(dep.owner||"")).toUpperCase();
+        if (!hay.includes(q)) continue;
+      }
+      shown++;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="nowrap selCell" data-label="Sel"><input type="radio" name="selDpto" data-dpto="${dep.dpto}" ${state.selectedDpto===dep.dpto?"checked":""}/></td>
+        <td class="nowrap" data-label="Piso">${dep.piso}</td>
+        <td class="nowrap" data-label="Dpto"><b>${dep.dpto}</b></td>
+        <td data-label="Propietario"><input data-k="owner" data-dpto="${dep.dpto}" value="${escapeAttr(dep.owner||"")}" style="width:100%"/></td>
+        <td class="nowrap" data-label="Monto (S/.)"><input class="w110" type="number" min="0" step="0.01" data-k="due" data-dpto="${dep.dpto}" value="${Number(p.due||0).toFixed(2)}"/></td>
+        <td class="nowrap" data-label="Pagado (S/.)"><input class="w110" type="number" min="0" step="0.01" data-k="paid" data-dpto="${dep.dpto}" value="${Number(p.paid||0).toFixed(2)}"/></td>
+        <td class="nowrap" data-cell="status" data-label="Estado">${statusPill(st)}</td>
+        <td class="nowrap" data-label="Fecha pago"><input class="w130" type="date" data-k="date" data-dpto="${dep.dpto}" value="${escapeAttr(p.date||"")}"/></td>
+        <td class="nowrap" data-label="Medio">
+          <select class="w130" data-k="method" data-dpto="${dep.dpto}">
+            ${optMethod("PLIN", p.method)}
+            ${optMethod("TRANSFERENCIA", p.method)}
+            ${optMethod("EFECTIVO", p.method)}
+            ${optMethod("OTRO", p.method)}
+          </select>
+        </td>
+        <td class="nowrap" data-label="N° operación"><input class="w160" data-k="op" data-dpto="${dep.dpto}" value="${escapeAttr(p.op||"")}"/></td>
+        <td data-label="Nota"><input data-k="note" data-dpto="${dep.dpto}" value="${escapeAttr(p.note||"")}" style="width:100%"/></td>
+      `;
+      tbody.appendChild(tr);
+    }
+    $("miniFiltro").textContent = shown ? `${shown} dptos mostrados` : "Sin resultados";
+    tbody.querySelectorAll('input[type="radio"][name="selDpto"]').forEach(r=>{
+      r.addEventListener("change", ()=>{ state.selectedDpto = r.dataset.dpto; markDirty(); });
+    });
+    tbody.querySelectorAll("input[data-k], select[data-k]").forEach(el=>{
+      el.addEventListener("input", onCellChange);
+      el.addEventListener("change", onCellChange);
+    });
+  }
+
+  function onCellChange(e){
+    const el = e.target;
+    const k = el.dataset.k;
+    const dpto = el.dataset.dpto;
+    if (!k || !dpto) return;
+
+    if (k==="owner"){
+      const dep = state.data.depts.find(x=>x.dpto===dpto);
+      dep.owner = el.value;
+    } else {
+      const p = getMonthPagos()[dpto];
+      if (k==="due" || k==="paid") p[k] = round2(el.value);
+      else p[k] = el.value;
+    }
+    markDirty();
+
+    const tr = el.closest("tr");
+    if (tr){
+      const st = computeStatus(getMonthPagos()[dpto]);
+      const td = tr.querySelector('td[data-cell="status"]');
+      if (td) td.innerHTML = statusPill(st);
+    }
+    renderSummary();
+  }
+
+  function renderSummary(){
+    const pagos = getMonthPagos();
+    let total=0, rec=0;
+    const pend=[];
+    const pisoMap={1:[],2:[],3:[],4:[],5:[]};
+
+    for (const dep of state.data.depts){
+      const p = pagos[dep.dpto];
+      const due = Number(p.due||0);
+      const paid = Number(p.paid||0);
+      total += due;
+      rec += paid;
+      const st = computeStatus(p);
+      if (st!=="PAGADO") pend.push(dep.dpto);
+      pisoMap[dep.piso].push({dpto:dep.dpto, st});
+    }
+
+    $("kpiTotal").textContent = fmtMoney(total);
+    $("kpiRecaudado").textContent = fmtMoney(rec);
+    $("kpiAvance").textContent = pct(total>0 ? rec/total : 0);
+
+    const sem=[];
+    for (let piso=1;piso<=5;piso++){
+      const arr=pisoMap[piso];
+      const ok=arr.filter(x=>x.st==="PAGADO").length;
+      let icon="🔴";
+      if (ok===4) icon="🟢";
+      else if (ok===3) icon="🟡";
+      sem.push(`<div class="small">${icon} <b>Piso ${piso}</b>: ${ok}/4 <span class="muted">(pend: ${arr.filter(x=>x.st!=="PAGADO").map(x=>x.dpto).join(", ")||"—"})</span></div>`);
+    }
+    $("semPisos").innerHTML = sem.join("");
+
+    $("pendientes").innerHTML = pend.length
+      ? `<div class="small"><b>${pend.length}</b> pendientes: <b>${pend.join(", ")}</b></div>`
+      : `<div class="small">🟢 Todos al día.</div>`;
+
+    const ranking = state.data.depts
+      .map(dep=>{
+        const p = pagos[dep.dpto];
+        const due = Number(p.due||0);
+        const paid = Number(p.paid||0);
+        const saldo = round2(due - paid);
+        return {dpto:dep.dpto, piso:dep.piso, saldo};
+      })
+      .filter(x=>x.saldo>0)
+      .sort((a,b)=>b.saldo-a.saldo);
+
+    $("ranking").innerHTML = ranking.length
+      ? ranking.slice(0,10).map((x,i)=>`<div class="small"><b>${i+1}.</b> Dpto <b>${x.dpto}</b> (Piso ${x.piso}) · Saldo: <b>S/ ${x.saldo.toFixed(2)}</b></div>`).join("")
+      : `<div class="small">🟢 Sin saldo pendiente.</div>`;
+
+    const md = getMonthData();
+    $("miniFecha").textContent = md.fechaLimite ? `· Fecha límite: ${formatDateShort(md.fechaLimite)}` : "";
+
+    const wsp = [
+      `📌 *BLOCK 12 · Cobranza ${monthName(state.currentMonth)}*`,
+      `Cuota: *S/ ${Number(md.cuotaBase||0).toFixed(2)}* por dpto.`,
+      `Fecha límite: *${md.fechaLimite?formatDateShort(md.fechaLimite):"(sin fecha)"}*.`,
+      `Pago: PLIN *${state.data.settings.plin}* (Titular: ${state.data.settings.titular}).`,
+      pend.length ? `Pendientes: *${pend.join(", ")}*` : `🟢 Todos al día. ¡Gracias!`,
+      `Enviar *captura + N° operación* para registrar.`
+    ].join("\n");
+    $("msgWsp").value = wsp;
+  }
+
+  function renderGastos(){
+    const md = getMonthData();
+    const tbody = $("tbodyGastos");
+    tbody.innerHTML = "";
+    for (let i=0;i<md.gastos.length;i++){
+      const g = md.gastos[i];
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><input data-gi="${i}" data-gk="concepto" value="${escapeAttr(g.concepto||"")}" style="width:100%"/></td>
+        <td class="nowrap"><input class="w110" type="number" min="0" step="0.01" data-gi="${i}" data-gk="monto" value="${Number(g.monto||0).toFixed(2)}"/></td>
+        <td class="nowrap"><input class="w130" type="date" data-gi="${i}" data-gk="venc" value="${escapeAttr(g.venc||"")}"/></td>
+        <td class="nowrap no-print"><button class="ghost" data-delg="${i}">Quitar</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+    tbody.querySelectorAll("input[data-gi]").forEach(el=>{
+      el.addEventListener("input", onGastoChange);
+      el.addEventListener("change", onGastoChange);
+    });
+    tbody.querySelectorAll("button[data-delg]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const idx=Number(btn.dataset.delg);
+        md.gastos.splice(idx,1);
+        markDirty();
+        renderGastos();
+        renderGastosTotals();
+      });
+    });
+    renderGastosTotals();
+  }
+
+  function onGastoChange(e){
+    const el=e.target;
+    const i=Number(el.dataset.gi);
+    const k=el.dataset.gk;
+    const md=getMonthData();
+    if (!md.gastos[i]) return;
+    if (k==="monto") md.gastos[i][k]=round2(el.value);
+    else md.gastos[i][k]=el.value;
+    markDirty();
+    renderGastosTotals();
+  }
+
+  function renderGastosTotals(){
+    const md=getMonthData();
+    const total = md.gastos.reduce((a,g)=>a+Number(g.monto||0),0);
+    $("totalGastos").value = total.toFixed(2);
+    const cuota = total / state.data.settings.numDepts;
+    $("cuotaCalc").value = isFinite(cuota) ? round2(cuota).toFixed(2) : "0.00";
+  }
+
+  function buildPrintArea(){
+    const md=getMonthData();
+    const pagos=getMonthPagos();
+    const total=state.data.depts.reduce((a,dep)=>a+Number(pagos[dep.dpto].due||0),0);
+    const rec=state.data.depts.reduce((a,dep)=>a+Number(pagos[dep.dpto].paid||0),0);
+    const pend=state.data.depts.filter(dep=>computeStatus(pagos[dep.dpto])!=="PAGADO").map(dep=>dep.dpto);
+
+    $("printArea").classList.remove("hidden");
+    $("printSub").textContent = `${monthName(state.currentMonth)} · Generado: ${new Date().toLocaleString()}`;
+    $("pRecaudado").textContent = fmtMoney(rec);
+    $("pTotal").textContent = fmtMoney(total);
+    $("pAvance").textContent = pct(total>0 ? rec/total : 0);
+    $("pPend").textContent = String(pend.length);
+    $("pPlin").textContent = state.data.settings.plin || "";
+    $("pTitular").textContent = state.data.settings.titular || "";
+    $("pLim").textContent = md.fechaLimite ? formatDateShort(md.fechaLimite) : "(sin fecha)";
+
+    const pisoMap={1:[],2:[],3:[],4:[],5:[]};
+    for (const dep of state.data.depts){
+      pisoMap[dep.piso].push({dpto:dep.dpto, st:computeStatus(pagos[dep.dpto])});
+    }
+    const sem=[];
+    for (let piso=1;piso<=5;piso++){
+      const arr=pisoMap[piso];
+      const ok=arr.filter(x=>x.st==="PAGADO").length;
+      let icon="🔴";
+      if (ok===4) icon="🟢";
+      else if (ok===3) icon="🟡";
+      sem.push(`<div class="small">${icon} <b>Piso ${piso}</b>: ${ok}/4 · Pendientes: ${arr.filter(x=>x.st!=="PAGADO").map(x=>x.dpto).join(", ")||"—"}</div>`);
+    }
+    $("pSem").innerHTML = sem.join("");
+    $("pPendList").innerHTML = pend.length ? `<div class="small"><b>${pend.join(", ")}</b></div>` : `<div class="small">🟢 Sin pendientes.</div>`;
+
+    const pt=$("pTable");
+    pt.innerHTML="";
+    for (const dep of state.data.depts){
+      const p=pagos[dep.dpto];
+      const st=computeStatus(p);
+      const tr=document.createElement("tr");
+      tr.innerHTML = `
+        <td>${dep.piso}</td>
+        <td><b>${dep.dpto}</b></td>
+        <td>${escapeHTML(dep.owner||"")}</td>
+        <td>${Number(p.due||0).toFixed(2)}</td>
+        <td>${Number(p.paid||0).toFixed(2)}</td>
+        <td>${st}</td>
+        <td>${p.date?formatDateShort(p.date):""}</td>
+        <td>${(p.method||"")}</td>
+        <td>${escapeHTML(p.op||"")}</td>
+        <td>${escapeHTML(p.note||"")}</td>
+      `;
+      pt.appendChild(tr);
+    }
+    $("pFoot").textContent = "Estado = PAGADO / PARCIAL / PENDIENTE (según Pagado vs Monto).";
+    setTimeout(()=>$("printArea").classList.add("hidden"), 1200);
+  }
+
+  function escapeHTML(s){
+    return String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+  }
+
+
+  function getPendientes(){
+    const pagos = getMonthPagos();
+    return state.data.depts.filter(dep=>computeStatus(pagos[dep.dpto])!=="PAGADO").map(dep=>dep.dpto);
+  }
+
+  function buildCSV(){
+    const pagos = getMonthPagos();
+    const rows = [
+      ["Mes","Piso","Dpto","Propietario","Monto","Pagado","Estado","FechaPago","Medio","Operacion","Nota"]
+    ];
+    for (const dep of state.data.depts){
+      const p = pagos[dep.dpto];
+      const st = computeStatus(p);
+      rows.push([
+        monthName(state.currentMonth),
+        dep.piso,
+        dep.dpto,
+        dep.owner||"",
+        Number(p.due||0).toFixed(2),
+        Number(p.paid||0).toFixed(2),
+        st,
+        p.date||"",
+        p.method||"",
+        p.op||"",
+        p.note||""
+      ]);
+    }
+    const esc = (v)=>`"${String(v??"").replaceAll('"','""')}"`;
+    return rows.map(r=>r.map(esc).join(",")).join("\n");
+  }
+
+  async function copyToClipboard(text, okMsg){
+    try{
+      await navigator.clipboard.writeText(text);
+      alert(okMsg || "Copiado.");
+    }catch(e){
+      // Fallback: muestra en prompt
+      window.prompt("Copia el texto:", text);
+    }
+  }
+  function hook(){
+    $("fechaLimite").addEventListener("change", ()=>{ getMonthData().fechaLimite=$("fechaLimite").value; markDirty(); renderSummary(); });
+    $("cuotaBase").addEventListener("input", ()=>{ getMonthData().cuotaBase=round2($("cuotaBase").value); markDirty(); renderSummary(); });
+    $("plin").addEventListener("input", ()=>{ state.data.settings.plin=$("plin").value.trim(); markDirty(); renderSummary(); });
+    $("titular").addEventListener("input", ()=>{ state.data.settings.titular=$("titular").value.trim(); markDirty(); renderSummary(); });
+
+    $("btnGuardar").addEventListener("click", ()=>save(false));
+
+    $("btnAplicarCuota").addEventListener("click", ()=>{
+      const cuota=round2(getMonthData().cuotaBase||0);
+      if (!confirm(`Aplicar cuota base S/ ${cuota.toFixed(2)} a todos los dptos de ${monthName(state.currentMonth)}?`)) return;
+      for (const dep of state.data.depts) getMonthPagos()[dep.dpto].due=cuota;
+      markDirty(); renderAll();
+    });
+
+    $("btnMarcarHoy").addEventListener("click", ()=>{
+      if (!state.selectedDpto){ alert("Selecciona un dpto (columna Sel)."); return; }
+      const p=getMonthPagos()[state.selectedDpto];
+      p.paid=round2(p.due);
+      p.date=nowISODate();
+      if (!p.method) p.method="PLIN";
+      markDirty(); renderAll();
+    });
+
+    $("btnAddGasto").addEventListener("click", ()=>{
+      getMonthData().gastos.push({concepto:"", monto:0, venc:""});
+      markDirty(); renderGastos();
+    });
+
+    $("btnCalcCuota").addEventListener("click", ()=>{
+      const md=getMonthData();
+      const total = md.gastos.reduce((a,g)=>a+Number(g.monto||0),0);
+      const cuota = round2(total / state.data.settings.numDepts);
+      md.cuotaBase=cuota;
+      $("cuotaBase").value = cuota.toFixed(2);
+      if (!confirm(`Cuota calculada = S/ ${cuota.toFixed(2)}. ¿Aplicarla a todos los dptos del mes?`)){
+        markDirty(); renderSummary(); return;
+      }
+      for (const dep of state.data.depts) getMonthPagos()[dep.dpto].due=cuota;
+      markDirty(); renderAll();
+    });
+
+    $("btnResetMes").addEventListener("click", ()=>{
+      if (!confirm(`Borrar pagos y montos del mes ${monthName(state.currentMonth)}?`)) return;
+      state.data.months[state.currentMonth]={fechaLimite:"",cuotaBase:0,gastos:[]};
+      state.data.pagos[state.currentMonth]={};
+      for (const dep of state.data.depts) state.data.pagos[state.currentMonth][dep.dpto]={due:0, paid:0, date:"", method:"PLIN", op:"", note:""};
+      markDirty(); renderAll();
+    });
+
+    $("btnBackup").addEventListener("click", ()=>{
+      save(true);
+      const blob=new Blob([JSON.stringify(state.data,null,2)],{type:"application/json"});
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download=`block12_cobranzas_backup_${state.currentMonth}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(a.href);
+      markBackedUp("JSON");
+    });
+
+    $("btnImport").addEventListener("click", ()=> $("fileImport").click());
+
+    $("btnCopyCode").addEventListener("click", ()=>{
+      save(true);
+      const code = makeBackupCode();
+      copyToClipboard(code, "Código copiado. Pégalo en WhatsApp (Mensajes guardados) o en un correo para restaurar en otro equipo.");
+      markBackedUp("Código");
+    });
+
+    $("btnRestoreCode").addEventListener("click", ()=>{
+      const code = window.prompt("Pega aquí el CÓDIGO de respaldo (empieza con B12v1:)", "");
+      if (!code) return;
+      try{
+        restoreFromBackupCode(code);
+        alert("Restaurado OK.");
+      }catch(e){
+        alert("No se pudo restaurar: " + e.message);
+      }
+    });
+
+    $("btnConnectFile").addEventListener("click", ()=> connectFile());
+    $("btnSaveFile").addEventListener("click", async ()=>{
+      save(true);
+      const ok = await writeConnectedFile();
+      if (ok) { alert("Guardado en archivo OK."); markBackedUp("Archivo"); }
+      else alert("No se pudo guardar en archivo (usa Backup JSON o código).");
+    });
+    $("btnDisconnectFile").addEventListener("click", ()=> disconnectFile());
+
+    $("fileImport").addEventListener("change", async ()=>{
+      const f=$("fileImport").files[0];
+      if (!f) return;
+      try{
+        const obj=JSON.parse(await f.text());
+        if (!obj || !obj.depts || !obj.months || !obj.pagos) throw new Error("Formato inválido");
+        state.data=obj;
+        for (const m of MONTHS) initMonth(m.key);
+        markDirty(); save(true); renderAll();
+        alert("Importado OK.");
+        markBackedUp("Import");
+      }catch(err){ alert("No se pudo importar: " + err.message); }
+      finally{ $("fileImport").value=""; }
+    });
+
+    $("btnExportPDF").addEventListener("click", ()=>{ buildPrintArea(); window.print(); });
+
+    $("btnExportCSV").addEventListener("click", ()=>{
+      save(true);
+      const csv = buildCSV();
+      const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download=`block12_cobranzas_${state.currentMonth}.csv`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(a.href);
+      markBackedUp("JSON");
+    });
+
+    $("btnCopyWsp").addEventListener("click", ()=>copyToClipboard($("msgWsp").value, "Mensaje copiado."));
+    $("btnCopyPend").addEventListener("click", ()=>{
+      const pend = getPendientes();
+      const text = pend.length ? `Pendientes ${monthName(state.currentMonth)}: ${pend.join(", ")}` : "Sin pendientes.";
+      copyToClipboard(text, "Pendientes copiados.");
+    });
+
+    ["filtroPiso","filtroEstado","buscar"].forEach(id=>{
+      $(id).addEventListener("input", renderAll);
+      $(id).addEventListener("change", renderAll);
+    });
+  }
+
+  function renderAll(){
+    renderHeader();
+    renderGastos();
+    renderTable();
+    renderSummary();
+  }
+
+  window.addEventListener("beforeunload", ()=>{ if (state.dirty) save(true); });
+
+  load();
+  setBackupTag();
+  loadFileHandle();
+  setupMonthSelector();
+  hook();
+  renderAll();
+})();
+</script>
+</body>
+</html>
