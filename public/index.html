@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Block 12 — Cobranzas (Feb–Jun 2026)</title>
+  <style>
+    :root{--bg:#0b1020;--card:#111a33;--muted:#8aa0c6;--txt:#e7efff;--ok:#1db954;--warn:#f5c542;--bad:#ff4d4d;--line:#23345f;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:linear-gradient(180deg,#071028,#0b1020);color:var(--txt)}
+    header{padding:16px 14px;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;background:rgba(11,16,32,.9);backdrop-filter:blur(8px);z-index:20}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .wrap{max-width:1100px;margin:0 auto;padding:14px}
+    h1{font-size:18px;margin:0 0 8px 0}
+    .card{background:rgba(17,26,51,.92);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.22)}
+    label{font-size:12px;color:var(--muted)}
+    select,input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a1430;color:var(--txt);outline:none}
+    textarea{min-height:38px}
+    button{padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#122252;color:var(--txt);cursor:pointer}
+    button:hover{filter:brightness(1.05)}
+    button.primary{background:#1b3aa6;border-color:rgba(255,255,255,.18)}
+    button.danger{background:#7a1f2a}
+    .pill{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.12);color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
+    .kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    .kpi .box{background:#0a1430;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px}
+    .big{font-size:20px;font-weight:700;margin-top:6px}
+    .small{font-size:12px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
+    th{font-size:12px;color:var(--muted);text-align:left}
+    .status{font-weight:700}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+    .muted{color:var(--muted)}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .footer-note{font-size:12px;color:var(--muted);margin-top:8px}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#0a1430;border:1px solid rgba(255,255,255,.15);padding:10px 12px;border-radius:14px;display:none;z-index:50;max-width:min(560px,92vw)}
+    .toast.show{display:block}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    @media (max-width: 860px){
+      .grid{grid-template-columns:1fr}
+      .kpi{grid-template-columns:repeat(2,minmax(0,1fr))}
+      table, thead, tbody, th, td, tr { display:block; }
+      thead{display:none}
+      tr{border:1px solid rgba(255,255,255,.08);border-radius:14px;margin:10px 0;background:#0a1430}
+      td{border-bottom:1px solid rgba(255,255,255,.07)}
+      td:last-child{border-bottom:none}
+      td[data-label]::before{content:attr(data-label);display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <h1>Block 12 — Control de Cobranzas (Feb–Jun 2026)</h1>
+          <div class="row">
+            <span class="pill" id="savePill">Auto-guardado local: —</span>
+            <span class="pill" id="cloudPill">Nube: —</span>
+          </div>
+        </div>
+        <div class="row">
+          <button class="primary" id="btnPdf">Exportar PDF</button>
+          <button id="btnCsv">Exportar CSV</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="grid">
+      <div class="card">
+        <div class="row">
+          <div style="min-width:220px;flex:1">
+            <label>Mes</label>
+            <select id="period">
+              <option value="2026-02">Febrero 2026</option>
+              <option value="2026-03">Marzo 2026</option>
+              <option value="2026-04">Abril 2026</option>
+              <option value="2026-05">Mayo 2026</option>
+              <option value="2026-06">Junio 2026</option>
+            </select>
+          </div>
+          <div style="min-width:220px;flex:1">
+            <label>Fecha límite</label>
+            <input id="deadline" type="date" />
+          </div>
+          <div style="min-width:220px;flex:1">
+            <label>Cuota base por dpto (S/)</label>
+            <input id="fee" type="number" step="0.01" />
+          </div>
+        </div>
+
+        <div class="two" style="margin-top:10px">
+          <div>
+            <label>Medio de pago (texto para mostrar)</label>
+            <input id="payMedium" placeholder="Ej: PLIN 978 515 968" />
+          </div>
+          <div>
+            <label>Recepciona</label>
+            <input id="receiver" placeholder="Ej: William Huatay Villoslada" />
+          </div>
+        </div>
+
+        <div class="kpi" style="margin-top:12px">
+          <div class="box"><div class="small">Recaudado</div><div class="big" id="kpiCollected">S/ 0.00</div></div>
+          <div class="box"><div class="small">Pendiente</div><div class="big" id="kpiPending">S/ 0.00</div></div>
+          <div class="box"><div class="small">Al día</div><div class="big" id="kpiPaid">0/20</div></div>
+          <div class="box"><div class="small">Pendientes (dptos)</div><div class="big" id="kpiMissing">—</div></div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <button id="btnMarkPaid">Marcar Pagado (hoy)</button>
+          <select id="quickUnit" style="max-width:160px"><option value="">Dpto…</option></select>
+          <button id="btnCopyMissing">Copiar pendientes</button>
+          <button id="btnCopyMsg">Copiar mensaje por pisos</button>
+        </div>
+
+        <div class="row" style="margin-top:10px;align-items:flex-end">
+          <div style="flex:1;min-width:260px">
+            <label>Sincronización en nube (Cloudflare D1)</label>
+            <div class="row">
+              <input id="apiBase" placeholder="Ej: https://tu-sitio.pages.dev" />
+              <button id="btnCloudPull">Traer de nube</button>
+              <button class="primary" id="btnCloudPush">Subir a nube</button>
+            </div>
+            <div class="footer-note">La nube requiere una clave (X-App-Key). Se guarda solo en este navegador (session).</div>
+          </div>
+          <div style="min-width:240px">
+            <label>Clave de nube</label>
+            <input id="appKey" type="password" placeholder="Pega tu APP_KEY" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button id="btnBackup">Backup JSON</button>
+          <button id="btnImport">Importar JSON</button>
+          <input id="fileImport" type="file" accept="application/json" style="display:none" />
+          <button id="btnCopyCode">Copiar código respaldo</button>
+          <button class="danger" id="btnRestoreCode">Restaurar código</button>
+        </div>
+
+        <div class="footer-note">Consejo de supervivencia: aunque uses nube, haz backup mensual. Los desastres no avisan, solo llegan.</div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="small">Semáforo por piso (4 dptos por piso)</div>
+            <div id="byFloor" style="margin-top:8px"></div>
+          </div>
+          <div style="text-align:right">
+            <div class="small">Última edición</div>
+            <div class="mono" id="lastEdit">—</div>
+          </div>
+        </div>
+        <hr style="border:0;border-top:1px solid rgba(255,255,255,.08);margin:10px 0" />
+        <div class="small">Detalle por departamento</div>
+        <div style="overflow:auto;margin-top:8px">
+          <table id="tbl">
+            <thead><tr>
+              <th>Dpto</th><th>Piso</th><th>Monto</th><th>Pagado</th><th>Saldo</th><th>Fecha</th><th>Medio</th><th>Operación</th><th>Nota</th><th>Estado</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const UNITS = (() => {
+  const arr = [];
+  for (let floor=1; floor<=5; floor++){
+    for (let i=1; i<=4; i++){
+      arr.push({unit: `${floor}0${i}`, floor});
+    }
+  }
+  return arr;
+})();
+
+const DEFAULTS = {
+  "2026-02": { deadline: "2026-02-19", fee: 114.82, payMedium:"PLIN 978 515 968", receiver:"William Huatay Villoslada" },
+  "2026-03": { deadline: "2026-03-19", fee: 0, payMedium:"", receiver:"" },
+  "2026-04": { deadline: "2026-04-19", fee: 0, payMedium:"", receiver:"" },
+  "2026-05": { deadline: "2026-05-19", fee: 0, payMedium:"", receiver:"" },
+  "2026-06": { deadline: "2026-06-19", fee: 0, payMedium:"", receiver:"" },
+};
+
+function emptyPeriod(period){
+  const def = DEFAULTS[period] || {deadline:"", fee:0, payMedium:"", receiver:""};
+  return {
+    period,
+    meta: { ...def },
+    rows: UNITS.map(u => ({
+      unit: u.unit,
+      floor: u.floor,
+      amount_due: Number(def.fee||0),
+      amount_paid: 0,
+      paid_date: "",
+      method: "",
+      op: "",
+      note: ""
+    })),
+    updated_at: Date.now()
+  };
+}
+
+function keyLocal(period){ return `block12:cobranzas:${period}`; }
+
+let state = null;
+let autosaveTimer = null;
+let cloudAutosyncTimer = null;
+
+const el = (id)=>document.getElementById(id);
+const periodSel = el("period");
+const deadlineInp = el("deadline");
+const feeInp = el("fee");
+const payMediumInp = el("payMedium");
+const receiverInp = el("receiver");
+const tbody = el("tbody");
+const savePill = el("savePill");
+const cloudPill = el("cloudPill");
+const lastEdit = el("lastEdit");
+const quickUnit = el("quickUnit");
+const toast = el("toast");
+const apiBaseInp = el("apiBase");
+const appKeyInp = el("appKey");
+
+function money(n){ return `S/ ${Number(n||0).toFixed(2)}`; }
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"), 2200);
+}
+
+function loadLocal(period){
+  const raw = localStorage.getItem(keyLocal(period));
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+function saveLocal(){
+  if (!state) return;
+  state.updated_at = Date.now();
+  localStorage.setItem(keyLocal(state.period), JSON.stringify(state));
+  savePill.textContent = `Auto-guardado local: ${new Date(state.updated_at).toLocaleString()}`;
+  lastEdit.textContent = new Date(state.updated_at).toLocaleString();
+}
+
+function scheduleSave(){
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(()=>{
+    saveLocal();
+    computeAndRender();
+    scheduleCloudAutosync();
+  }, 250);
+}
+
+function getAppKey(){
+  const v = appKeyInp.value.trim();
+  if (v) sessionStorage.setItem("block12:appkey", v);
+  return (v || sessionStorage.getItem("block12:appkey") || "").trim();
+}
+
+function getApiBase(){
+  const v = apiBaseInp.value.trim().replace(/\/+$/,"");
+  if (v) localStorage.setItem("block12:apibase", v);
+  return (v || localStorage.getItem("block12:apibase") || "").trim().replace(/\/+$/,"");
+}
+
+async function cloudGet(period){
+  const base = getApiBase();
+  const key = getAppKey();
+  if (!base) throw new Error("Falta API base");
+  if (!key) throw new Error("Falta APP_KEY");
+  const r = await fetch(`${base}/api/state?period=${encodeURIComponent(period)}`, {
+    headers: { "X-App-Key": key }
+  });
+  if (!r.ok) throw new Error(`Nube GET error ${r.status}`);
+  return await r.json();
+}
+
+async function cloudPut(payload){
+  const base = getApiBase();
+  const key = getAppKey();
+  if (!base) throw new Error("Falta API base");
+  if (!key) throw new Error("Falta APP_KEY");
+  const r = await fetch(`${base}/api/state`, {
+    method: "POST",
+    headers: { "Content-Type":"application/json", "X-App-Key": key },
+    body: JSON.stringify(payload)
+  });
+  if (!r.ok) throw new Error(`Nube POST error ${r.status}`);
+  return await r.json();
+}
+
+function scheduleCloudAutosync(){
+  clearTimeout(cloudAutosyncTimer);
+  const base = getApiBase();
+  const key = getAppKey();
+  if (!base || !key) return;
+  cloudAutosyncTimer = setTimeout(async ()=>{
+    try{
+      const res = await cloudPut({period: state.period, json: state});
+      cloudPill.textContent = `Nube: guardado ${new Date(res.updated_at).toLocaleString()}`;
+    }catch(e){
+      cloudPill.textContent = `Nube: error (ver clave/base)`;
+    }
+  }, 900);
+}
+
+function setInputs(){
+  deadlineInp.value = state.meta.deadline || "";
+  feeInp.value = Number(state.meta.fee || 0).toFixed(2);
+  payMediumInp.value = state.meta.payMedium || "";
+  receiverInp.value = state.meta.receiver || "";
+  apiBaseInp.value = getApiBase();
+  appKeyInp.value = sessionStorage.getItem("block12:appkey") || "";
+}
+
+function buildQuickUnits(){
+  quickUnit.innerHTML = `<option value="">Dpto…</option>` + UNITS.map(u=>`<option value="${u.unit}">${u.unit}</option>`).join("");
+}
+
+function computeAndRender(){
+  if (!state) return;
+  let collected = 0, pending = 0, paidCount = 0;
+  for (const r of state.rows){
+    const due = Number(r.amount_due||0);
+    const paid = Number(r.amount_paid||0);
+    const saldo = Math.max(0, due - paid);
+    collected += paid;
+    pending += saldo;
+    if (saldo <= 0.009 && due>0){ paidCount++; }
+  }
+  el("kpiCollected").textContent = money(collected);
+  el("kpiPending").textContent = money(pending);
+  el("kpiPaid").textContent = `${paidCount}/20`;
+
+  const missing = state.rows.filter(r => (r.amount_due||0)>0 && Math.max(0,(r.amount_due||0)-(r.amount_paid||0))>0.009).map(r=>r.unit);
+  el("kpiMissing").textContent = missing.length ? missing.join(", ") : "—";
+
+  const floors = {1:[],2:[],3:[],4:[],5:[]};
+  for (const r of state.rows) floors[r.floor].push(r);
+  el("byFloor").innerHTML = Object.keys(floors).map(f=>{
+    const rows = floors[f];
+    const paid = rows.filter(x=>Math.max(0,(x.amount_due||0)-(x.amount_paid||0))<=0.009 && (x.amount_due||0)>0).length;
+    const status = paid===4 ? "ok" : paid===3 ? "warn" : "bad";
+    const emoji = paid===4 ? "🟢" : paid===3 ? "🟡" : "🔴";
+    const pend = rows.filter(x=>Math.max(0,(x.amount_due||0)-(x.amount_paid||0))>0.009 && (x.amount_due||0)>0).map(x=>x.unit).join(", ") || "—";
+    return `<div style="margin:8px 0;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:#0a1430">
+      <div class="row" style="justify-content:space-between">
+        <div><span class="status ${status}">${emoji} Piso ${f}</span> <span class="muted">(${paid}/4 al día)</span></div>
+        <div class="muted">Pendientes: ${pend}</div>
+      </div>
+    </div>`;
+  }).join("");
+
+  tbody.innerHTML = "";
+  for (const r of state.rows){
+    const due = Number(r.amount_due||0);
+    const paid = Number(r.amount_paid||0);
+    const saldo = Math.max(0, due - paid);
+    let st = "PENDIENTE", cls = "bad";
+    if (due<=0){ st="SIN MONTO"; cls="warn"; }
+    else if (saldo<=0.009){ st="PAGADO"; cls="ok"; }
+    else if (paid>0){ st="PARCIAL"; cls="warn"; }
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td data-label="Dpto"><strong>${r.unit}</strong></td>
+      <td data-label="Piso">${r.floor}</td>
+      <td data-label="Monto (S/)"><input data-k="amount_due" data-u="${r.unit}" type="number" step="0.01" value="${due.toFixed(2)}"></td>
+      <td data-label="Pagado (S/)"><input data-k="amount_paid" data-u="${r.unit}" type="number" step="0.01" value="${paid.toFixed(2)}"></td>
+      <td data-label="Saldo">${money(saldo)}</td>
+      <td data-label="Fecha"><input data-k="paid_date" data-u="${r.unit}" type="date" value="${r.paid_date||""}"></td>
+      <td data-label="Medio"><input data-k="method" data-u="${r.unit}" value="${escapeHtml(r.method||"")}"></td>
+      <td data-label="Operación"><input data-k="op" data-u="${r.unit}" value="${escapeHtml(r.op||"")}"></td>
+      <td data-label="Nota"><textarea data-k="note" data-u="${r.unit}">${escapeHtml(r.note||"")}</textarea></td>
+      <td data-label="Estado"><span class="status ${cls}">${st}</span></td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function updateMetaFromInputs(){
+  state.meta.deadline = deadlineInp.value;
+  state.meta.fee = Number(feeInp.value || 0);
+  state.meta.payMedium = payMediumInp.value.trim();
+  state.meta.receiver = receiverInp.value.trim();
+}
+
+function findRow(unit){ return state.rows.find(x=>x.unit===unit); }
+
+function onTableInput(e){
+  const t = e.target;
+  const k = t.getAttribute("data-k");
+  const u = t.getAttribute("data-u");
+  if (!k || !u) return;
+  const r = findRow(u);
+  if (!r) return;
+
+  if (k==="amount_due" || k==="amount_paid") r[k] = Number(t.value || 0);
+  else r[k] = t.value;
+  scheduleSave();
+}
+
+async function switchPeriod(period){
+  const local = loadLocal(period);
+  state = local || emptyPeriod(period);
+  state.rows = UNITS.map(u=>{
+    const old = (state.rows||[]).find(x=>x.unit===u.unit);
+    return old ? {...old, floor:u.floor, unit:u.unit} : ({unit:u.unit,floor:u.floor,amount_due:Number(state.meta.fee||0),amount_paid:0,paid_date:"",method:"",op:"",note:""});
+  });
+  setInputs();
+  buildQuickUnits();
+  computeAndRender();
+  saveLocal();
+  cloudPill.textContent = "Nube: —";
+}
+
+function exportCsv(){
+  const headers = ["Periodo","Dpto","Piso","Monto","Pagado","Saldo","Fecha","Medio","Operacion","Nota","Estado"];
+  const lines = [headers.join(",")];
+  for (const r of state.rows){
+    const due = Number(r.amount_due||0);
+    const paid = Number(r.amount_paid||0);
+    const saldo = Math.max(0, due - paid);
+    let st = "PENDIENTE";
+    if (due<=0) st="SIN MONTO";
+    else if (saldo<=0.009) st="PAGADO";
+    else if (paid>0) st="PARCIAL";
+    const row = [
+      state.period, r.unit, r.floor,
+      due.toFixed(2), paid.toFixed(2), saldo.toFixed(2),
+      r.paid_date||"", q(r.method||""), q(r.op||""), q(r.note||""), st
+    ];
+    lines.push(row.join(","));
+  }
+  const blob = new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `block12_cobranzas_${state.period}.csv`;
+  a.click();
+}
+function q(s){
+  const x = String(s ?? "");
+  if (/[",\n]/.test(x)) return '"' + x.replace(/"/g,'""') + '"';
+  return x;
+}
+
+function backupJson(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `block12_cobranzas_${state.period}.json`;
+  a.click();
+  showToast("Backup JSON descargado.");
+}
+
+function importJsonFile(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const obj = JSON.parse(reader.result);
+      if (!obj || !obj.period || !obj.rows) throw new Error("JSON inválido");
+      state = obj;
+      periodSel.value = state.period;
+      setInputs();
+      computeAndRender();
+      saveLocal();
+      showToast("Importación OK.");
+    }catch(e){
+      showToast("No se pudo importar: " + e.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function copyMissing(){
+  const miss = el("kpiMissing").textContent;
+  navigator.clipboard.writeText(miss==="—" ? "" : miss);
+  showToast("Pendientes copiados.");
+}
+
+function periodLabel(p){
+  const [y,m]=p.split("-");
+  const map={ "02":"FEB","03":"MAR","04":"ABR","05":"MAY","06":"JUN" };
+  return `${map[m] || m} ${y}`;
+}
+
+function copyMsgByFloors(){
+  const floors = {1:[],2:[],3:[],4:[],5:[]};
+  for (const r of state.rows) floors[r.floor].push(r);
+  let msg = `📌 Control de Cobranza ${periodLabel(state.period)}\n`;
+  for (let f=1; f<=5; f++){
+    const rows = floors[f];
+    const paid = rows.filter(x=>Math.max(0,(x.amount_due||0)-(x.amount_paid||0))<=0.009 && (x.amount_due||0)>0).length;
+    const emoji = paid===4 ? "🟢" : paid===3 ? "🟡" : "🔴";
+    const pend = rows.filter(x=>Math.max(0,(x.amount_due||0)-(x.amount_paid||0))>0.009 && (x.amount_due||0)>0).map(x=>x.unit).join(", ") || "—";
+    msg += `${emoji} Piso ${f}: ${paid}/4 al día (pendientes: ${pend})\n`;
+  }
+  msg += `\nPago: ${state.meta.payMedium || "—"} — ${state.meta.receiver || ""}\n`;
+  msg += `Fecha límite: ${state.meta.deadline || "—"}\n`;
+  navigator.clipboard.writeText(msg);
+  showToast("Mensaje por pisos copiado.");
+}
+
+function copyCode(){
+  const code = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+  navigator.clipboard.writeText(code);
+  showToast("Código copiado.");
+}
+
+function restoreCode(){
+  const code = prompt("Pega aquí el código de respaldo:");
+  if (!code) return;
+  try{
+    const json = decodeURIComponent(escape(atob(code.trim())));
+    const obj = JSON.parse(json);
+    if (!obj || !obj.period || !obj.rows) throw new Error("Formato inválido");
+    state = obj;
+    periodSel.value = state.period;
+    setInputs();
+    computeAndRender();
+    saveLocal();
+    showToast("Restauración OK.");
+  }catch(e){
+    showToast("No se pudo restaurar: " + e.message);
+  }
+}
+
+function markPaidToday(){
+  const u = quickUnit.value;
+  if (!u) return showToast("Selecciona dpto.");
+  const r = findRow(u);
+  if (!r) return;
+  if ((r.amount_due||0) <= 0) return showToast("Primero define monto.");
+  r.amount_paid = Number(r.amount_due||0);
+  r.paid_date = new Date().toISOString().slice(0,10);
+  scheduleSave();
+  showToast(`${u} marcado pagado.`);
+}
+
+async function cloudPull(){
+  try{
+    const data = await cloudGet(state.period);
+    if (!data || !data.json) return showToast("Nube sin datos para este mes.");
+    const cloudTs = data.updated_at || 0;
+    const localTs = state.updated_at || 0;
+    if (cloudTs > localTs){
+      state = data.json;
+      periodSel.value = state.period;
+      setInputs();
+      computeAndRender();
+      saveLocal();
+      cloudPill.textContent = `Nube: cargado ${new Date(cloudTs).toLocaleString()}`;
+      showToast("Traído de nube.");
+    } else {
+      cloudPill.textContent = `Nube: ya estabas al día`;
+      showToast("Tu local ya era igual o más reciente.");
+    }
+  }catch(e){
+    cloudPill.textContent = `Nube: error`;
+    showToast(e.message);
+  }
+}
+
+async function cloudPush(){
+  try{
+    const res = await cloudPut({period: state.period, json: state});
+    cloudPill.textContent = `Nube: guardado ${new Date(res.updated_at).toLocaleString()}`;
+    showToast("Subido a nube.");
+  }catch(e){
+    cloudPill.textContent = `Nube: error`;
+    showToast(e.message);
+  }
+}
+
+function exportPdf(){
+  const w = window.open("", "_blank");
+  const missing = el("kpiMissing").textContent;
+  const html = `
+  <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reporte Cobranzas ${state.period}</title>
+  <style>
+    body{font-family:Calibri,Arial,sans-serif;margin:24px}
+    h1{margin:0 0 10px 0;color:#1F4E79}
+    .meta{margin:6px 0 14px 0}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{border:1px solid #bbb;padding:6px;vertical-align:top}
+    th{background:#f3f6ff}
+    .kpi{display:flex;gap:12px;margin:10px 0 14px 0;flex-wrap:wrap}
+    .box{border:1px solid #bbb;padding:8px;border-radius:8px;min-width:160px}
+    .muted{color:#555}
+  </style>
+  </head><body>
+    <h1>Control de Cobranzas — ${periodLabel(state.period)}</h1>
+    <div class="meta">
+      <div><b>Fecha límite:</b> ${state.meta.deadline || "—"}</div>
+      <div><b>Cuota base:</b> ${money(state.meta.fee || 0)}</div>
+      <div><b>Pago:</b> ${(state.meta.payMedium || "—")} ${(state.meta.receiver ? "— " + state.meta.receiver : "")}</div>
+    </div>
+    <div class="kpi">
+      <div class="box"><div class="muted">Recaudado</div><div><b>${el("kpiCollected").textContent}</b></div></div>
+      <div class="box"><div class="muted">Pendiente</div><div><b>${el("kpiPending").textContent}</b></div></div>
+      <div class="box"><div class="muted">Al día</div><div><b>${el("kpiPaid").textContent}</b></div></div>
+      <div class="box"><div class="muted">Pendientes</div><div><b>${missing}</b></div></div>
+    </div>
+    <table>
+      <thead><tr>
+        <th>Dpto</th><th>Piso</th><th>Monto</th><th>Pagado</th><th>Saldo</th><th>Fecha</th><th>Medio</th><th>Operación</th><th>Nota</th><th>Estado</th>
+      </tr></thead>
+      <tbody>
+        ${state.rows.map(r=>{
+          const due = Number(r.amount_due||0);
+          const paid = Number(r.amount_paid||0);
+          const saldo = Math.max(0, due-paid);
+          let st = "PENDIENTE";
+          if (due<=0) st="SIN MONTO";
+          else if (saldo<=0.009) st="PAGADO";
+          else if (paid>0) st="PARCIAL";
+          return `<tr>
+            <td><b>${r.unit}</b></td>
+            <td>${r.floor}</td>
+            <td>${due.toFixed(2)}</td>
+            <td>${paid.toFixed(2)}</td>
+            <td>${saldo.toFixed(2)}</td>
+            <td>${r.paid_date||""}</td>
+            <td>${(r.method||"").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</td>
+            <td>${(r.op||"").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</td>
+            <td>${(r.note||"").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</td>
+            <td><b>${st}</b></td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+    <p class="muted" style="margin-top:12px">Generado: ${new Date().toLocaleString()}</p>
+    <script>window.onload=()=>window.print();<\/script>
+  </body></html>`;
+  w.document.write(html);
+  w.document.close();
+}
+
+periodSel.addEventListener("change", ()=> switchPeriod(periodSel.value));
+deadlineInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
+feeInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
+payMediumInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
+receiverInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
+
+el("tbl").addEventListener("input", onTableInput);
+el("tbl").addEventListener("change", onTableInput);
+
+el("btnPdf").addEventListener("click", exportPdf);
+el("btnCsv").addEventListener("click", exportCsv);
+el("btnBackup").addEventListener("click", backupJson);
+el("btnImport").addEventListener("click", ()=> el("fileImport").click());
+el("fileImport").addEventListener("change", (e)=> e.target.files?.[0] && importJsonFile(e.target.files[0]));
+el("btnCopyMissing").addEventListener("click", copyMissing);
+el("btnCopyMsg").addEventListener("click", copyMsgByFloors);
+el("btnCopyCode").addEventListener("click", copyCode);
+el("btnRestoreCode").addEventListener("click", restoreCode);
+el("btnMarkPaid").addEventListener("click", markPaidToday);
+
+el("btnCloudPull").addEventListener("click", cloudPull);
+el("btnCloudPush").addEventListener("click", cloudPush);
+apiBaseInp.addEventListener("change", ()=>{ localStorage.setItem("block12:apibase", getApiBase()); showToast("API base guardada."); });
+appKeyInp.addEventListener("change", ()=>{ sessionStorage.setItem("block12:appkey", getAppKey()); showToast("Clave guardada (solo esta sesión)."); });
+
+(async function init(){
+  buildQuickUnits();
+  const base = localStorage.getItem("block12:apibase") || "";
+  if (base) apiBaseInp.value = base;
+  await switchPeriod(periodSel.value);
+  showToast("Listo. Auto-guardado local activo.");
+})();
+</script>
+</body>
+</html>

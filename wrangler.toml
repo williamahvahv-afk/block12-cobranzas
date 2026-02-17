@@ -1,0 +1,7 @@
+name = "block12-cobranzas"
+compatibility_date = "2026-02-17"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "block12_cobranzas"
+database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
