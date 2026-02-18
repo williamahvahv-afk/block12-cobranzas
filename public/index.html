@@ -1346,8 +1346,7 @@ el("btnMarkPaid").addEventListener("click", markPaidToday);
 
 (async function init(){
   buildQuickUnits();
-  await 
-    // Nube: configuración mínima (sin panel)
+  // Nube: configuración mínima (sin panel)
     bootstrapKeyFromUrl();
     refreshCloudPill();
     cloudPill.style.cursor = "pointer";
