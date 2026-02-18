@@ -256,6 +256,17 @@
     @media (max-width: 560px){
       #byFloor{grid-template-columns:1fr}
     }
+
+    /* Modal (conectar a la nube) */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:99}
+    .modal.hidden{display:none}
+    .modalCard{width:min(560px,96vw);background:rgba(10,16,40,.98);border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.55);overflow:hidden}
+    .modalHead{display:flex;align-items:center;gap:10px;padding:14px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .modalTitle{font-weight:800;letter-spacing:.2px}
+    .modalBody{padding:14px}
+    .modalBody input{width:100%}
+    .modalFoot{display:flex;align-items:center;gap:10px;padding:14px;border-top:1px solid rgba(255,255,255,.08)}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.12)}
 </style>
 </head>
 <body>
@@ -347,40 +358,6 @@
             <button id="btnCopyMissing">Copiar pendientes</button>
             <button id="btnCopyMsg">Copiar mensaje por pisos</button>
           </div>
-        </div>
-
-        <div class="section col4">
-          <div class="sectionTitle">Nube y respaldo</div>
-
-          <div class="form2">
-            <div>
-              <label>API base (Pages)</label>
-              <input id="apiBase" placeholder="Ej: https://block12-cobranzas.pages.dev" />
-              <div class="footer-note">Tip: se guarda en este navegador (localStorage).</div>
-            </div>
-            <div>
-              <label>Clave de nube (APP_KEY)</label>
-              <input id="appKey" type="password" placeholder="Pega tu APP_KEY" />
-              <div class="footer-note">Se guarda solo en esta sesión (sessionStorage).</div>
-            </div>
-          </div>
-
-          <div class="btnbar" style="margin-top:10px">
-            <button id="btnCloudPull">Traer de nube</button>
-            <button class="primary" id="btnCloudPush">Subir a nube</button>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="btnbar">
-            <button id="btnBackup">Backup JSON</button>
-            <button id="btnImport">Importar JSON</button>
-            <input id="fileImport" type="file" accept="application/json" style="display:none" />
-            <button id="btnCopyCode">Copiar código respaldo</button>
-            <button class="danger" id="btnRestoreCode">Restaurar código</button>
-          </div>
-
-          <div class="footer-note">Regla de oro: nube + backup mensual. El único “sin riesgo” es el que nunca se usa.</div>
         </div>
 
         <div class="section col12" id="servicesBox">
@@ -509,7 +486,8 @@ const DEFAULTS = {
   "2026-03": { deadline: "2026-03-19", fee: 0, payMedium:"", receiver:"" },
   "2026-04": { deadline: "2026-04-19", fee: 0, payMedium:"", receiver:"" },
   "2026-05": { deadline: "2026-05-19", fee: 0, payMedium:"", receiver:"" },
-  "2026-06": { deadline: "2026-06-19", fee: 0, payMedium:"", receiver:"" },
+  "2026-06": { deadline: "2026-06-19", fee: 0, payMedium:"", receiver:"" }
+};
 
 // ---- Servicios del mes (pagos de agua/luz/seguridad/limpieza + otros) ----
 function defaultServices(){
@@ -579,8 +557,7 @@ const cloudPill = el("cloudPill");
 const lastEdit = el("lastEdit");
 const quickUnit = el("quickUnit");
 const toast = el("toast");
-const apiBaseInp = el("apiBase");
-const appKeyInp = el("appKey");
+// Cloud: API base = same origin, APP_KEY en localStorage (modal)
 // Servicios UI
 const svcTotalEl = el("svcTotal");
 const svcPaidEl = el("svcPaid");
@@ -623,18 +600,112 @@ function scheduleSave(){
   }, 250);
 }
 
-function getAppKey(){
-  const v = appKeyInp.value.trim();
-  if (v) sessionStorage.setItem("block12:appkey", v);
-  return (v || sessionStorage.getItem("block12:appkey") || "").trim();
-}
 
-function getApiBase(){
-  const v = apiBaseInp.value.trim().replace(/\/+$/,"");
-  if (v) localStorage.setItem("block12:apibase", v);
-  return (v || localStorage.getItem("block12:apibase") || "").trim().replace(/\/+$/,"");
-}
+    function getApiBase(){
+      return (window.location.origin || "").replace(/\/+$/,"");
+    }
+    function getAppKey(){
+      return (localStorage.getItem("block12:appkey") || "").trim();
+    }
+    function setAppKey(v){
+      const val = (v||"").trim();
+      if(val) localStorage.setItem("block12:appkey", val);
+      else localStorage.removeItem("block12:appkey");
+    }
 
+    let promptedCloudKey = false;
+
+    function refreshCloudPill(text){
+      const key = getAppKey();
+      if(!key){
+        cloudPill.textContent = text || "Nube: sin clave (toca aquí)";
+        cloudPill.title = "Ingresa tu APP_KEY para guardar directo en la base de datos";
+      }else{
+        cloudPill.textContent = text || "Nube: lista";
+        cloudPill.title = "Guardado automático en D1 (haz clic para cambiar la clave)";
+      }
+    }
+
+    function openCloudModal(){
+      const modal = el("cloudModal");
+      const inp = el("appKeyModal");
+      if(!modal || !inp) return;
+      inp.value = getAppKey();
+      modal.classList.remove("hidden");
+      modal.setAttribute("aria-hidden","false");
+      setTimeout(()=>inp.focus(), 0);
+    }
+    function closeCloudModal(){
+      const modal = el("cloudModal");
+      if(!modal) return;
+      modal.classList.add("hidden");
+      modal.setAttribute("aria-hidden","true");
+    }
+
+    function bootstrapKeyFromUrl(){
+      try{
+        const url = new URL(window.location.href);
+        const k = url.searchParams.get("key") || url.searchParams.get("k") || url.searchParams.get("appkey");
+        if(k && k.trim()){
+          setAppKey(k.trim());
+          url.searchParams.delete("key"); url.searchParams.delete("k"); url.searchParams.delete("appkey");
+          window.history.replaceState({}, "", url.toString());
+        }
+      }catch(e){}
+    }
+
+    function applyLoadedState(obj){
+      state = obj && typeof obj === "object" ? obj : emptyPeriod(periodSel.value);
+      state.period = periodSel.value;
+      state.meta = state.meta || {};
+      ensureServices(state.meta);
+      // asegurar filas 101..504
+      const seen = new Set((state.rows||[]).map(r=>String(r.dpto)));
+      for (const u of UNITS){
+        if(!seen.has(String(u.dpto))){
+          state.rows.push({ dpto:String(u.dpto), piso:u.piso, monto:0, pagado:0, fecha:"", medio:"", operacion:"", nota:"" });
+        }
+      }
+      // normalizar tipos
+      state.rows = (state.rows||[]).map(r=>({
+        dpto:String(r.dpto||""),
+        piso: Number(r.piso||0) || 0,
+        monto: Number(r.monto||0) || 0,
+        pagado: Number(r.pagado||0) || 0,
+        fecha: r.fecha||"",
+        medio: r.medio||"",
+        operacion: r.operacion||"",
+        nota: r.nota||""
+      }));
+      computeAndRender();
+      saveLocal();
+    }
+
+    async function cloudPullSilent(){
+      const key = getAppKey();
+      if(!key){
+        refreshCloudPill();
+        return;
+      }
+      refreshCloudPill("Nube: cargando…");
+      try{
+        const r = await cloudGet(periodSel.value);
+        const cloudJson = r && r.json ? r.json : null;
+        const cloudTs = +(new Date((r && r.updated_at) || 0));
+        const localTs = +(new Date(state.updated_at || 0));
+        if(cloudJson && cloudTs > localTs){
+          applyLoadedState(cloudJson);
+          state.updated_at = (r && r.updated_at) || state.updated_at;
+          saveLocal();
+          refreshCloudPill("Nube: sincronizado ✓");
+        }else{
+          refreshCloudPill("Nube: al día ✓");
+        }
+      }catch(e){
+        console.error(e);
+        refreshCloudPill("Nube: error");
+      }
+    }
 async function cloudGet(period){
   const base = getApiBase();
   const key = getAppKey();
@@ -661,28 +732,36 @@ async function cloudPut(payload){
   return await r.json();
 }
 
-function scheduleCloudAutosync(){
-  clearTimeout(cloudAutosyncTimer);
-  const base = getApiBase();
-  const key = getAppKey();
-  if (!base || !key) return;
-  cloudAutosyncTimer = setTimeout(async ()=>{
-    try{
-      const res = await cloudPut({period: state.period, json: state});
-      cloudPill.textContent = `Nube: guardado ${new Date(res.updated_at).toLocaleString()}`;
-    }catch(e){
-      cloudPill.textContent = `Nube: error (ver clave/base)`;
+
+    function scheduleCloudAutosync(){
+      const base = getApiBase();
+      const key = getAppKey();
+      if(!key){
+        cloudPill.textContent = "Nube: sin clave (toca aquí)";
+        if(!promptedCloudKey){ promptedCloudKey = true; openCloudModal(); }
+        cloudPill.title = "Ingresa tu APP_KEY para guardar directo en la base de datos";
+        return;
+      }
+      cloudPill.title = "Guardado automático en D1";
+      clearTimeout(cloudAutosyncTimer);
+      cloudAutosyncTimer = setTimeout(async ()=>{
+        cloudPill.textContent = "Nube: guardando…";
+        try{
+          await cloudPut(periodSel.value, state);
+          cloudPill.textContent = "Nube: guardado ✓";
+        }catch(e){
+          console.error(e);
+          cloudPill.textContent = "Nube: error";
+        }
+      }, 900);
     }
-  }, 900);
-}
+
 
 function setInputs(){
   deadlineInp.value = state.meta.deadline || "";
   feeInp.value = Number(state.meta.fee || 0).toFixed(2);
   payMediumInp.value = state.meta.payMedium || "";
   receiverInp.value = state.meta.receiver || "";
-  apiBaseInp.value = getApiBase();
-  appKeyInp.value = sessionStorage.getItem("block12:appkey") || "";
 }
 
 function buildQuickUnits(){
@@ -1159,7 +1238,7 @@ function exportPdf(){
   w.document.close();
 }
 
-periodSel.addEventListener("change", ()=> switchPeriod(periodSel.value));
+periodSel.addEventListener("change", ()=>{ switchPeriod(periodSel.value); cloudPullSilent(); });
 deadlineInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
 feeInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
 payMediumInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
@@ -1255,27 +1334,81 @@ el("tbl").addEventListener("change", onTableInput);
 
 el("btnPdf").addEventListener("click", exportPdf);
 el("btnCsv").addEventListener("click", exportCsv);
-el("btnBackup").addEventListener("click", backupJson);
-el("btnImport").addEventListener("click", ()=> el("fileImport").click());
-el("fileImport").addEventListener("change", (e)=> e.target.files?.[0] && importJsonFile(e.target.files[0]));
+el("btnBackup")?.addEventListener("click", backupJson);
+el("btnImport")?.addEventListener("click", ()=> el("fileImport").click());
+el("fileImport")?.addEventListener("change", (e)=> e.target.files?.[0] && importJsonFile(e.target.files[0]));
 el("btnCopyMissing").addEventListener("click", copyMissing);
 el("btnCopyMsg").addEventListener("click", copyMsgByFloors);
-el("btnCopyCode").addEventListener("click", copyCode);
-el("btnRestoreCode").addEventListener("click", restoreCode);
+el("btnCopyCode")?.addEventListener("click", copyCode);
+el("btnRestoreCode")?.addEventListener("click", restoreCode);
 el("btnMarkPaid").addEventListener("click", markPaidToday);
 
-el("btnCloudPull").addEventListener("click", cloudPull);
-el("btnCloudPush").addEventListener("click", cloudPush);
-apiBaseInp.addEventListener("change", ()=>{ localStorage.setItem("block12:apibase", getApiBase()); showToast("API base guardada."); });
-appKeyInp.addEventListener("change", ()=>{ sessionStorage.setItem("block12:appkey", getAppKey()); showToast("Clave guardada (solo esta sesión)."); });
 
 (async function init(){
   buildQuickUnits();
-  const base = localStorage.getItem("block12:apibase") || "";
-  if (base) apiBaseInp.value = base;
-  await switchPeriod(periodSel.value);
+  await 
+    // Nube: configuración mínima (sin panel)
+    bootstrapKeyFromUrl();
+    refreshCloudPill();
+    cloudPill.style.cursor = "pointer";
+    cloudPill.addEventListener("click", openCloudModal);
+
+    el("btnCloseCloudModal")?.addEventListener("click", closeCloudModal);
+    el("btnCancelCloud")?.addEventListener("click", closeCloudModal);
+    el("btnSaveKey")?.addEventListener("click", ()=>{
+      const v = (el("appKeyModal")?.value || "").trim();
+      if(!v){ alert("Pega tu APP_KEY."); return; }
+      setAppKey(v);
+      closeCloudModal();
+      refreshCloudPill("Nube: lista");
+      cloudPullSilent();
+    });
+    el("btnForgetKey")?.addEventListener("click", ()=>{
+      if(confirm("¿Seguro? Se eliminará la APP_KEY guardada en este dispositivo.")){
+        setAppKey("");
+        closeCloudModal();
+        refreshCloudPill();
+      }
+    });
+
+    // cerrar modal al hacer click fuera
+    el("cloudModal")?.addEventListener("click", (ev)=>{
+      if(ev.target && ev.target.id === "cloudModal") closeCloudModal();
+    });
+    document.addEventListener("keydown", (ev)=>{
+      if(ev.key === "Escape") closeCloudModal();
+    });
+
+switchPeriod(periodSel.value);
   showToast("Listo. Auto-guardado local activo.");
 })();
 </script>
+
+  <!-- Modal: Conectar a la nube (APP_KEY) -->
+  <div id="cloudModal" class="modal hidden" aria-hidden="true">
+    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="cloudModalTitle">
+      <div class="modalHead">
+        <div class="modalTitle" id="cloudModalTitle">Conectar a la nube</div>
+        <button class="btn ghost" id="btnCloseCloudModal" type="button" title="Cerrar">✕</button>
+      </div>
+      <div class="modalBody">
+        <div class="muted" style="margin-bottom:10px">
+          Para guardar directo en la base de datos (D1), ingresa tu clave <b>APP_KEY</b> una sola vez en este equipo.
+          <br>Tip: si cambias de celular/PC, solo vuelves a pegarla.
+        </div>
+        <label class="label">Clave de nube (APP_KEY)</label>
+        <input id="appKeyModal" type="password" placeholder="Pega tu APP_KEY" autocomplete="off" />
+        <div class="muted" style="margin-top:8px">
+          Nota: la clave se guarda <b>solo en este dispositivo</b> (localStorage). Si no quieres eso, usa “Olvidar clave” al terminar.
+        </div>
+      </div>
+      <div class="modalFoot">
+        <button class="btn" id="btnForgetKey" type="button">Olvidar clave</button>
+        <div style="flex:1"></div>
+        <button class="btn" id="btnCancelCloud" type="button">Cancelar</button>
+        <button class="btn primary" id="btnSaveKey" type="button">Guardar</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
