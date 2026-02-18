@@ -203,33 +203,6 @@
       box-shadow:0 18px 50px rgba(0,0,0,.35);
     }
     .toast.show{display:block}
-
-    /* Expenses */
-    .expenseWrap{display:grid;grid-template-columns:1.4fr .6fr;gap:10px;align-items:start}
-    .expenseTableWrap{
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;
-      overflow:auto;
-      background:rgba(10,20,48,.55);
-    }
-    .expenseTable{width:100%;border-collapse:separate;border-spacing:0;min-width:520px}
-    .expenseTable th,.expenseTable td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:middle}
-    .expenseTable th{
-      font-size:12px;color:var(--muted);text-align:left;
-      position:sticky;top:0;background:rgba(10,20,48,.96);backdrop-filter:blur(6px);z-index:2
-    }
-    .expenseTable tr:last-child td{border-bottom:none}
-    .expenseTotals .box{min-height:auto}
-    .expenseKpis{display:grid;grid-template-columns:1fr;gap:10px}
-    .expenseRowActions{display:flex;justify-content:flex-end}
-    .iconBtn{
-      padding:8px 10px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(122,31,42,.65);
-    }
-    .iconBtn:hover{filter:brightness(1.08)}
-    .chk input{accent-color:#1b3aa6}
-
     /* Responsive */
     @media (max-width: 1180px){
       .topInner .col4{grid-column:span 6}
@@ -239,8 +212,6 @@
       .topInner .col4{grid-column:span 12}
       .form3{grid-template-columns:1fr}
       .form2{grid-template-columns:1fr}
-      .expenseWrap{grid-template-columns:1fr}
-      .expenseTable{min-width:0}
       #byFloor{grid-template-columns:repeat(2,minmax(0,1fr))}
       table{min-width:0}
     }
@@ -317,7 +288,7 @@
             </div>
             <div>
               <label>Cuota base por dpto (S/)</label>
-              <input id="fee" type="number" step="0.01" min="0" inputmode="decimal" readonly title="Se calcula automáticamente (Total gastos / 20)" />
+              <input id="fee" type="number" step="0.01" min="0" inputmode="decimal" />
             </div>
           </div>
 
@@ -332,55 +303,6 @@
             </div>
           </div>
         </div>
-      <div class="section col4" id="secExpenses">
-        <div class="sectionTitle">
-          <span>Gastos del mes</span>
-          <button id="btnAddExpense" type="button" title="Añadir un gasto">+ Añadir</button>
-        </div>
-        <div class="muted" style="margin:-4px 0 10px 0;font-size:12px">
-          Registra agua, luz, seguridad, limpieza y otros. El total se divide entre <b>20</b> departamentos y actualiza la <b>cuota</b> automáticamente.
-        </div>
-
-        <div class="expenseWrap">
-          <div class="expenseTableWrap">
-            <table class="expenseTable">
-              <thead>
-                <tr>
-                  <th style="min-width:180px">Concepto</th>
-                  <th style="width:140px">Monto (S/)</th>
-                  <th style="width:160px">Vencimiento</th>
-                  <th style="width:70px"> </th>
-                </tr>
-              </thead>
-              <tbody id="expenseTbody"></tbody>
-            </table>
-          </div>
-
-          <div class="expenseTotals">
-            <div class="expenseKpis">
-              <div class="box">
-                <div class="small">Total gastos</div>
-                <div class="big" id="expTotal">S/ 0.00</div>
-              </div>
-              <div class="box">
-                <div class="small">Cuota por dpto (Total/20)</div>
-                <div class="big" id="expFee">S/ 0.00</div>
-              </div>
-            </div>
-
-            <label class="chk" style="margin-top:10px;display:flex;gap:10px;align-items:center">
-              <input type="checkbox" id="applyFee" checked style="width:auto;transform:scale(1.05)">
-              <span>Aplicar cuota calculada a todos los dptos</span>
-            </label>
-
-            <div class="muted" style="margin-top:8px;font-size:12px">
-              Tip: si editas manualmente el “Monto” por departamento, se desactiva esta opción.
-            </div>
-          </div>
-        </div>
-      </div>
-
-
 
         <div class="section col4">
           <div class="sectionTitle">Resumen del mes</div>
@@ -504,61 +426,22 @@ const UNITS = (() => {
 })();
 
 const DEFAULTS = {
-  "2026-02": { deadline: "2026-02-20", fee: 114.82, payMedium:"PLIN 978 515 968", receiver:"William Huatay Villoslada" },
+  "2026-02": { deadline: "2026-02-19", fee: 114.82, payMedium:"PLIN 978 515 968", receiver:"William Huatay Villoslada" },
   "2026-03": { deadline: "2026-03-19", fee: 0, payMedium:"", receiver:"" },
   "2026-04": { deadline: "2026-04-19", fee: 0, payMedium:"", receiver:"" },
   "2026-05": { deadline: "2026-05-19", fee: 0, payMedium:"", receiver:"" },
   "2026-06": { deadline: "2026-06-19", fee: 0, payMedium:"", receiver:"" },
 };
 
-
-const DEFAULT_EXPENSES = {
-  // Valores sugeridos (según tu modelo FEB-2026). Puedes cambiarlos en la app.
-  "2026-02": [
-    { id:"agua", name:"Servicio de Agua", amount: 1434.80, due_date:"2026-03-02" },
-    { id:"luz", name:"Luz (áreas comunes)", amount: 61.60, due_date:"2026-02-20" },
-    { id:"seguridad", name:"Seguridad", amount: 600.00, due_date:"2026-02-28" },
-    { id:"limpieza", name:"Limpieza", amount: 200.00, due_date:"2026-02-28" }
-  ]
-};
-
-function defaultExpenses(period){
-  if (DEFAULT_EXPENSES[period]) return DEFAULT_EXPENSES[period].map(x=>({ ...x }));
-  // Para otros meses, deja la plantilla lista
-  return [
-    { id:"agua", name:"Servicio de Agua", amount: 0, due_date:"" },
-    { id:"luz", name:"Luz (áreas comunes)", amount: 0, due_date:"" },
-    { id:"seguridad", name:"Seguridad", amount: 0, due_date:"" },
-    { id:"limpieza", name:"Limpieza", amount: 0, due_date:"" }
-  ];
-}
-
-function uid(){ return Math.random().toString(36).slice(2,9); }
-
-function calcExpenses(expenses){
-  let total = 0;
-  for (const it of (expenses||[])){
-    const v = Number(it.amount||0);
-    if (!isNaN(v) && v>0) total += v;
-  }
-  total = Math.round(total*100)/100;
-  const fee = Math.round((total/20)*100)/100;
-  return { total, fee };
-}
-
-
 function emptyPeriod(period){
   const def = DEFAULTS[period] || {deadline:"", fee:0, payMedium:"", receiver:""};
-  const expenses = defaultExpenses(period);
-  const ex = calcExpenses(expenses);
-  const fee = ex.fee || Number(def.fee||0);
   return {
     period,
-    meta: { ...def, fee, expenses, expenses_total: ex.total, apply_fee: true },
+    meta: { ...def },
     rows: UNITS.map(u => ({
       unit: u.unit,
       floor: u.floor,
-      amount_due: Number(fee||0),
+      amount_due: Number(def.fee||0),
       amount_paid: 0,
       paid_date: "",
       method: "",
@@ -590,147 +473,12 @@ const toast = el("toast");
 const apiBaseInp = el("apiBase");
 const appKeyInp = el("appKey");
 
-// Expenses
-const expenseTbody = el("expenseTbody");
-const expTotalEl = el("expTotal");
-const expFeeEl = el("expFee");
-const applyFeeChk = el("applyFee");
-const btnAddExpense = el("btnAddExpense");
-
-
 function money(n){ return `S/ ${Number(n||0).toFixed(2)}`; }
 function showToast(msg){
   toast.textContent = msg;
   toast.classList.add("show");
   setTimeout(()=>toast.classList.remove("show"), 2200);
 }
-
-
-// ---------- Gastos (agua, luz, seguridad, limpieza, otros) ----------
-function normalizeMeta(){
-  if (!state.meta) state.meta = {deadline:"", fee:0, payMedium:"", receiver:""};
-  if (!Array.isArray(state.meta.expenses)) state.meta.expenses = defaultExpenses(state.period);
-  if (typeof state.meta.apply_fee !== "boolean") state.meta.apply_fee = true;
-
-  // Recalcula total y (si hay gastos) la cuota
-  const ex = calcExpenses(state.meta.expenses);
-  state.meta.expenses_total = ex.total;
-
-  // Si hay total > 0, la cuota manda; si no, respetamos la cuota existente (por si aún no llenas gastos)
-  if (ex.total > 0) state.meta.fee = ex.fee;
-}
-
-function renderExpenses(){
-  if (!expenseTbody) return;
-
-  normalizeMeta();
-  const expenses = state.meta.expenses || [];
-  const ex = calcExpenses(expenses);
-
-  // KPIs
-  if (expTotalEl) expTotalEl.textContent = money(ex.total);
-  if (expFeeEl) expFeeEl.textContent = money(ex.fee);
-
-  // cuota input (readonly)
-  if (feeInp) feeInp.value = Number(state.meta.fee||0).toFixed(2);
-
-  // checkbox
-  if (applyFeeChk) applyFeeChk.checked = !!state.meta.apply_fee;
-
-  // table
-  expenseTbody.innerHTML = expenses.map((it, idx)=>{
-    const safeName = (it.name||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    const amt = Number(it.amount||0);
-    const due = it.due_date || "";
-    const isCore = ["agua","luz","seguridad","limpieza"].includes(it.id);
-    return `
-      <tr data-idx="${idx}">
-        <td><input class="expName" value="${safeName}" placeholder="Concepto" /></td>
-        <td><input class="expAmt" type="number" step="0.01" min="0" inputmode="decimal" value="${isNaN(amt)?0:amt}" /></td>
-        <td><input class="expDue" type="date" value="${due}" /></td>
-        <td class="expenseRowActions">
-          <button class="iconBtn expDel" type="button" title="Eliminar" ${isCore?'disabled style="opacity:.35;cursor:not-allowed"':''}>✕</button>
-        </td>
-      </tr>
-    `;
-  }).join("");
-}
-
-function applyFeeFromExpenses(force=false){
-  normalizeMeta();
-  const ex = calcExpenses(state.meta.expenses||[]);
-  state.meta.expenses_total = ex.total;
-
-  // En carga inicial, solo recalculamos si hay gastos > 0.
-  // Cuando el usuario edita gastos (force=true), recalculamos incluso si el total queda en 0.
-  if (force || ex.total > 0){
-    state.meta.fee = ex.fee;
-  }
-
-  feeInp.value = Number(state.meta.fee||0).toFixed(2);
-  if (expTotalEl) expTotalEl.textContent = money(ex.total);
-  if (expFeeEl) expFeeEl.textContent = money(Number(state.meta.fee||0));
-
-  if (state.meta.apply_fee && (force || ex.total > 0)){
-    for (const r of (state.rows||[])){
-      r.amount_due = Number(state.meta.fee||0);
-    }
-  }
-}
-
-function addExpense(){
-  normalizeMeta();
-  state.meta.expenses.push({ id: "x_"+uid(), name:"Otros", amount:0, due_date:"" });
-  applyFeeFromExpenses(true);
-  renderExpenses();
-  computeAndRender();
-  scheduleSave();
-}
-
-function removeExpense(idx){
-  normalizeMeta();
-  const it = state.meta.expenses[idx];
-  if (!it) return;
-  if (["agua","luz","seguridad","limpieza"].includes(it.id)){
-    showToast("Ese concepto base no se elimina (solo cambia el monto).");
-    return;
-  }
-  state.meta.expenses.splice(idx, 1);
-  applyFeeFromExpenses(true);
-  renderExpenses();
-  computeAndRender();
-  scheduleSave();
-}
-
-function onExpenseInput(e){
-  const tr = e.target.closest("tr[data-idx]");
-  if (!tr) return;
-  const idx = Number(tr.dataset.idx);
-  normalizeMeta();
-  const it = state.meta.expenses[idx];
-  if (!it) return;
-
-  if (e.target.classList.contains("expName")){
-    it.name = e.target.value;
-  }else if (e.target.classList.contains("expAmt")){
-    it.amount = Math.max(0, Number(e.target.value||0) || 0);
-  }else if (e.target.classList.contains("expDue")){
-    it.due_date = e.target.value || "";
-  }
-
-  applyFeeFromExpenses(true);
-  computeAndRender();
-  scheduleSave();
-}
-
-function onExpenseClick(e){
-  if (e.target.classList.contains("expDel")){
-    const tr = e.target.closest("tr[data-idx]");
-    if (!tr) return;
-    removeExpense(Number(tr.dataset.idx));
-  }
-}
-
 
 function loadLocal(period){
   const raw = localStorage.getItem(keyLocal(period));
@@ -808,15 +556,12 @@ function scheduleCloudAutosync(){
 }
 
 function setInputs(){
-  normalizeMeta();
-  applyFeeFromExpenses();
   deadlineInp.value = state.meta.deadline || "";
   feeInp.value = Number(state.meta.fee || 0).toFixed(2);
   payMediumInp.value = state.meta.payMedium || "";
   receiverInp.value = state.meta.receiver || "";
   apiBaseInp.value = getApiBase();
   appKeyInp.value = sessionStorage.getItem("block12:appkey") || "";
-  renderExpenses();
 }
 
 function buildQuickUnits(){
@@ -824,18 +569,6 @@ function buildQuickUnits(){
 }
 
 function computeAndRender(){
-  normalizeMeta();
-  // Sanitiza números (evita negativos / NaN)
-  for (const r of (state.rows||[])){
-    r.amount_due = Math.max(0, Number(r.amount_due||0) || 0);
-    r.amount_paid = Math.max(0, Number(r.amount_paid||0) || 0);
-  }
-  // Si está activa la cuota automática, mantenemos el “monto” alineado
-  if (state?.meta?.apply_fee){
-    const f = Math.max(0, Number(state.meta.fee||0) || 0);
-    for (const r of (state.rows||[])) r.amount_due = f;
-  }
-
   if (!state) return;
 
   // Helpers
@@ -963,17 +696,9 @@ function onTableInput(e){
     if (!Number.isFinite(v) || Number.isNaN(v)) v = 0;
     if (v < 0) v = 0;
     r[k] = v;
-
-    // Si alguien edita el monto por dpto, respetamos la edición y apagamos “aplicar cuota automática”
-    if (k==="amount_due" && state?.meta?.apply_fee){
-      state.meta.apply_fee = false;
-      if (applyFeeChk) applyFeeChk.checked = false;
-      showToast("Cuota automática desactivada (editaste un monto por dpto).");
-    }
   } else {
     r[k] = t.value;
   }
-  computeAndRender();
   scheduleSave();
 }
 
@@ -1151,97 +876,94 @@ async function cloudPush(){
 }
 
 function exportPdf(){
-  normalizeMeta();
-  const ex = calcExpenses(state.meta.expenses||[]);
-  const paid = state.rows.reduce((s,r)=> s + Number(r.amount_paid||0), 0);
-  const due = state.rows.reduce((s,r)=> s + Number(r.amount_due||0), 0);
-  const missing = state.rows.filter(r => (Number(r.amount_due||0) - Number(r.amount_paid||0)) > 0.009).map(r=>r.unit).join(", ");
-  const apiBase = getApiBase();
-  const w = window.open("", "_blank");
-  const esc = (s)=>String(s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  const expRows = (state.meta.expenses||[]).map(it=>{
-    const amt = Number(it.amount||0);
-    const dueD = it.due_date ? new Date(it.due_date+"T00:00:00") : null;
-    const dueTxt = dueD ? dueD.toLocaleDateString() : "";
-    return `<tr>
-      <td>${esc(it.name)}</td>
-      <td style="text-align:right">${money(isNaN(amt)?0:amt)}</td>
-      <td style="text-align:right">${dueTxt}</td>
-    </tr>`;
-  }).join("");
+  const missing = state.rows
+    .filter(r => (r.amount_due||0)>0 && Math.max(0,(r.amount_due||0)-(r.amount_paid||0))>0.009)
+    .map(r=>r.unit).join(", ") || "—";
 
-  const html = `<!doctype html><html><head><meta charset="utf-8">
-  <title>Block 12 — Cobranzas</title>
+  const html = `
+  <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reporte Cobranzas ${state.period}</title>
   <style>
-    body{font-family:Arial, sans-serif; margin:24px; color:#111}
-    h1{font-size:18px;margin:0 0 6px}
-    h2{font-size:14px;margin:18px 0 8px}
-    .muted{color:#666}
-    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0 12px}
-    .box{border:1px solid #ddd;border-radius:10px;padding:10px}
-    table{width:100%;border-collapse:collapse}
-    th,td{border-bottom:1px solid #eee;padding:8px 6px;font-size:12px}
-    th{background:#fafafa;text-align:left}
-    .right{text-align:right}
-    .pending{color:#b00020;font-weight:800}
-    @media print { .no-print{display:none} }
-  </style></head><body>
-    <h1>Block 12 — Control de Cobranzas (${PERIOD_LABEL[state.period]})</h1>
-    <div class="muted">Fecha límite: <b>${state.meta.deadline || "-"}</b> · Cuota por dpto: <b>${money(Number(state.meta.fee||0))}</b></div>
-    <div class="muted">Nube (API): <b>${apiBase || "-"}</b></div>
-
-    <div class="kpis">
-      <div class="box"><div class="muted">Total gastos</div><div><b>${money(ex.total)}</b></div></div>
-      <div class="box"><div class="muted">Recaudado</div><div><b>${money(paid)}</b></div></div>
-      <div class="box"><div class="muted">Pendiente</div><div><b>${money(Math.max(0,due-paid))}</b></div></div>
-      <div class="box"><div class="muted">Dptos pendientes</div><div><b class="pending">${missing || "-"}</b></div></div>
+    body{font-family:Calibri,Arial,sans-serif;margin:24px}
+    h1{margin:0 0 10px 0;color:#1F4E79}
+    .meta{margin:6px 0 14px 0}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{border:1px solid #bbb;padding:6px;vertical-align:top}
+    th{background:#f3f6ff}
+    .kpi{display:flex;gap:12px;margin:10px 0 14px 0;flex-wrap:wrap}
+    .box{border:1px solid #bbb;padding:8px;border-radius:8px;min-width:160px}
+    .muted{color:#555}
+    .bad{color:#b00020;font-weight:700}
+    @media print{
+      .no-print{display:none !important;}
+      body{margin:10mm}
+    }
+  </style>
+  </head><body>
+    <div class="no-print muted" style="margin-bottom:10px">
+      Para guardar en PDF: en la ventana de impresión elige <b>Guardar como PDF</b> (o <b>Save as PDF</b>).
     </div>
-
-    <h2>Gastos del mes</h2>
-    <table>
-      <thead><tr><th>Concepto</th><th class="right">Monto</th><th class="right">Vencimiento</th></tr></thead>
-      <tbody>${expRows || `<tr><td colspan="3" class="muted">Sin gastos registrados</td></tr>`}</tbody>
-      <tfoot>
-        <tr>
-          <th>Total</th>
-          <th class="right">${money(ex.total)}</th>
-          <th class="right">Cuota: ${money(Number(state.meta.fee||0))}</th>
-        </tr>
-      </tfoot>
-    </table>
-
-    <h2>Detalle por departamento</h2>
+    <h1>Control de Cobranzas — ${periodLabel(state.period)}</h1>
+    <div class="meta">
+      <div><b>Fecha límite:</b> ${state.meta.deadline || "—"}</div>
+      <div><b>Cuota base:</b> ${money(state.meta.fee || 0)}</div>
+      <div><b>Pago:</b> ${(state.meta.payMedium || "—")} ${(state.meta.receiver ? "— " + state.meta.receiver : "")}</div>
+    </div>
+    <div class="kpi">
+      <div class="box"><div class="muted">Recaudado</div><div><b>${el("kpiCollected").textContent}</b></div></div>
+      <div class="box"><div class="muted">Pendiente</div><div><b>${el("kpiPending").textContent}</b></div></div>
+      <div class="box"><div class="muted">Al día</div><div><b>${el("kpiPaid").textContent}</b></div></div>
+      <div class="box"><div class="muted">Pendientes</div><div><b class="bad">${missing}</b></div></div>
+    </div>
     <table>
       <thead><tr>
-        <th>Dpto</th><th>Piso</th>
-        <th class="right">Monto</th><th class="right">Pagado</th><th class="right">Saldo</th>
-        <th>Fecha</th><th>Medio</th><th>Operación</th><th>Nota</th><th>Estado</th>
+        <th>Dpto</th><th>Piso</th><th>Monto</th><th>Pagado</th><th>Saldo</th><th>Fecha</th><th>Medio</th><th>Operación</th><th>Nota</th><th>Estado</th>
       </tr></thead>
       <tbody>
         ${state.rows.map(r=>{
-          const due = Number(r.amount_due||0), paid = Number(r.amount_paid||0);
-          const saldo = Math.max(0, due - paid);
-          const isPend = saldo > 0.009;
-          const st = isPend ? (paid>0? "PARCIAL":"PENDIENTE") : "PAGADO";
+          const due = Number(r.amount_due||0);
+          const paid = Number(r.amount_paid||0);
+          const saldo = Math.max(0, due-paid);
+          const st = saldo<=0.009 ? "AL DÍA" : (paid>0.009 ? "PARCIAL" : "PENDIENTE");
+          const safe = (s)=>String(s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
           return `<tr>
             <td><b>${r.unit}</b></td>
             <td>${r.floor}</td>
-            <td class="right">${money(due)}</td>
-            <td class="right">${money(paid)}</td>
-            <td class="right ${isPend?'pending':''}">${money(saldo)}</td>
+            <td>${due.toFixed(2)}</td>
+            <td>${paid.toFixed(2)}</td>
+            <td class="${saldo>0.009?'bad':''}">${saldo.toFixed(2)}</td>
             <td>${r.paid_date||""}</td>
-            <td>${esc(r.method)}</td>
-            <td>${esc(r.op)}</td>
-            <td>${esc(r.note)}</td>
-            <td><b class="${isPend?'pending':''}">${st}</b></td>
+            <td>${safe(r.method)}</td>
+            <td>${safe(r.op)}</td>
+            <td>${safe(r.note)}</td>
+            <td class="${st==='AL DÍA'?'':'bad'}"><b>${st}</b></td>
           </tr>`;
         }).join("")}
       </tbody>
     </table>
-
     <p class="muted" style="margin-top:12px">Generado: ${new Date().toLocaleString()}</p>
-    <script>window.onload=()=>window.print();<\/script>
+    <script>window.onload=()=>setTimeout(()=>window.print(),50);<\/script>
   </body></html>`;
+
+  // Intento 1: abrir pestaña nueva e imprimir
+  let w = null;
+  try { w = window.open("", "_blank"); } catch(e) { w = null; }
+
+  if(!w){
+    // Fallback: algunos navegadores (o navegadores dentro de apps) bloquean pop-ups
+    const blob = new Blob([html], {type:"text/html"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 15000);
+    alert("No se pudo abrir la ventana de impresión (pop-up bloqueado). Se intentó abrir una vista de impresión en otra pestaña. Si no aparece, abre la app en Chrome/Safari (no dentro de WhatsApp/Facebook) y habilita ventanas emergentes.");
+    return;
+  }
+
+  w.document.open();
   w.document.write(html);
   w.document.close();
 }
@@ -1253,30 +975,6 @@ payMediumInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSav
 receiverInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
 
 el("tbl").addEventListener("input", onTableInput);
-
-  // Gastos
-  if (btnAddExpense) btnAddExpense.addEventListener("click", addExpense);
-  if (expenseTbody){
-    expenseTbody.addEventListener("input", onExpenseInput);
-    expenseTbody.addEventListener("click", onExpenseClick);
-  }
-  if (applyFeeChk){
-    applyFeeChk.addEventListener("change", ()=>{
-      normalizeMeta();
-      state.meta.apply_fee = !!applyFeeChk.checked;
-      if (state.meta.apply_fee){
-        const ex = calcExpenses(state.meta.expenses||[]);
-        if (ex.total > 0){
-          applyFeeFromExpenses(false);
-        }else{
-          const f = Math.max(0, Number(state.meta.fee||0) || 0);
-          for (const r of (state.rows||[])) r.amount_due = f;
-        }
-        computeAndRender();
-      }
-      scheduleSave();
-    });
-  }
 el("tbl").addEventListener("change", onTableInput);
 
 el("btnPdf").addEventListener("click", exportPdf);
