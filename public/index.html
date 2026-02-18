@@ -91,7 +91,21 @@
     }
     .topInner .col4{grid-column:span 4;}
 
-    .section{
+    
+    .col12{grid-column:span 12;}
+    table.svc{min-width:760px;}
+    .svcKpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0 8px 0}
+    .svcKpi{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:14px;padding:12px}
+    .svcKpi .v{font-size:22px;font-weight:900;letter-spacing:.2px}
+    .svcKpi .t{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .svcActions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+    .svcAdd{display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end}
+    @media (max-width:900px){
+      .svcKpis{grid-template-columns:repeat(2,1fr)}
+      .svcAdd{grid-template-columns:1fr 1fr}
+      .svcAdd button{grid-column:1 / -1}
+    }
+.section{
       padding:12px;
       border-radius:14px;
       background:rgba(10,20,48,.55);
@@ -368,6 +382,71 @@
 
           <div class="footer-note">Regla de oro: nube + backup mensual. El único “sin riesgo” es el que nunca se usa.</div>
         </div>
+
+        <div class="section col12" id="servicesBox">
+          <div class="sectionTitle">Servicios y gastos del mes</div>
+
+          <div class="svcKpis">
+            <div class="svcKpi">
+              <div class="t">Total servicios</div>
+              <div class="v" id="svcTotal">S/ 0.00</div>
+            </div>
+            <div class="svcKpi">
+              <div class="t">Servicios pagados</div>
+              <div class="v" id="svcPaid">S/ 0.00</div>
+            </div>
+            <div class="svcKpi">
+              <div class="t">Servicios pendientes</div>
+              <div class="v" id="svcPending">S/ 0.00</div>
+            </div>
+            <div class="svcKpi">
+              <div class="t">Cuota sugerida por dpto (Total/20)</div>
+              <div class="v" id="svcPerDept">S/ 0.00</div>
+            </div>
+          </div>
+
+          <div class="svcActions">
+            <button id="btnUseSvcFee" class="primary" type="button">Usar cuota sugerida</button>
+            <label class="muted small" style="display:flex;align-items:center;gap:8px">
+              <input type="checkbox" id="chkApplyFeeRows" checked>
+              Aplicar a los 20 dptos (monto del mes)
+            </label>
+            <span class="muted small">Tip: con un click en <b>PAGADO/PENDIENTE</b> marcas el servicio.</span>
+          </div>
+
+          <div class="svcAdd">
+            <div>
+              <label>Nuevo servicio</label>
+              <input id="svcNewName" placeholder="Ej: Jardinería / Mantenimiento / Otros">
+            </div>
+            <div>
+              <label>Monto (S/)</label>
+              <input id="svcNewAmount" type="number" step="0.01" min="0" placeholder="0.00">
+            </div>
+            <div>
+              <button id="btnAddService" type="button">Agregar</button>
+            </div>
+          </div>
+
+          <div class="tableWrap" style="margin-top:10px">
+            <table class="svc">
+              <thead>
+                <tr>
+                  <th>Servicio</th>
+                  <th style="width:120px">Monto</th>
+                  <th style="width:120px">Estado</th>
+                  <th style="width:150px">Fecha</th>
+                  <th>Nota</th>
+                  <th style="width:70px"></th>
+                </tr>
+              </thead>
+              <tbody id="svcTbody"></tbody>
+            </table>
+          </div>
+
+          <div class="footer-note">Esto se guarda en local y también se incluye cuando exportas el PDF.</div>
+        </div>
+
         </div>
 
       </section>
@@ -431,13 +510,43 @@ const DEFAULTS = {
   "2026-04": { deadline: "2026-04-19", fee: 0, payMedium:"", receiver:"" },
   "2026-05": { deadline: "2026-05-19", fee: 0, payMedium:"", receiver:"" },
   "2026-06": { deadline: "2026-06-19", fee: 0, payMedium:"", receiver:"" },
+
+// ---- Servicios del mes (pagos de agua/luz/seguridad/limpieza + otros) ----
+function defaultServices(){
+  return [
+    {id:"agua", name:"Agua", amount:0, paid:false, paid_date:"", note:"", locked:true},
+    {id:"luz", name:"Luz", amount:0, paid:false, paid_date:"", note:"", locked:true},
+    {id:"seguridad", name:"Seguridad", amount:0, paid:false, paid_date:"", note:"", locked:true},
+    {id:"limpieza", name:"Limpieza", amount:0, paid:false, paid_date:"", note:"", locked:true},
+  ];
+}
+function ensureServices(meta){
+  if (!meta.services || !Array.isArray(meta.services.items)){
+    meta.services = { items: defaultServices() };
+    return;
+  }
+  // Completa básicos si faltan
+  const base = defaultServices();
+  const byId = Object.fromEntries(meta.services.items.map(s=>[s.id,s]));
+  for (const b of base){
+    if (!byId[b.id]) meta.services.items.push(b);
+    else byId[b.id].locked = true; // asegura que no se borren
+  }
+}
+function escAttr(s){
+  return String(s||"")
+    .replace(/&/g,"&amp;")
+    .replace(/"/g,"&quot;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+}
 };
 
 function emptyPeriod(period){
   const def = DEFAULTS[period] || {deadline:"", fee:0, payMedium:"", receiver:""};
   return {
     period,
-    meta: { ...def },
+    meta:{...def, services:{items: defaultServices()}},
     rows: UNITS.map(u => ({
       unit: u.unit,
       floor: u.floor,
@@ -472,6 +581,18 @@ const quickUnit = el("quickUnit");
 const toast = el("toast");
 const apiBaseInp = el("apiBase");
 const appKeyInp = el("appKey");
+// Servicios UI
+const svcTotalEl = el("svcTotal");
+const svcPaidEl = el("svcPaid");
+const svcPendingEl = el("svcPending");
+const svcPerDeptEl = el("svcPerDept");
+const svcTbody = el("svcTbody");
+const btnUseSvcFee = el("btnUseSvcFee");
+const chkApplyFeeRows = el("chkApplyFeeRows");
+const svcNewName = el("svcNewName");
+const svcNewAmount = el("svcNewAmount");
+const btnAddService = el("btnAddService");
+
 
 function money(n){ return `S/ ${Number(n||0).toFixed(2)}`; }
 function showToast(msg){
@@ -568,6 +689,41 @@ function buildQuickUnits(){
   quickUnit.innerHTML = `<option value="">Dpto…</option>` + UNITS.map(u=>`<option value="${u.unit}">${u.unit}</option>`).join("");
 }
 
+
+function servicesTotals(){
+  ensureServices(state.meta);
+  const items = state.meta.services.items;
+  const toNum = (v)=>{ const n=Number(v); return Number.isFinite(n)?n:0; };
+  const total = items.reduce((a,s)=>a+Math.max(0,toNum(s.amount)),0);
+  const paid = items.reduce((a,s)=>a+(s.paid?Math.max(0,toNum(s.amount)):0),0);
+  const pending = Math.max(0,total-paid);
+  const perDept = total/20;
+  return {total, paid, pending, perDept, items};
+}
+
+function renderServices(){
+  if (!state) return;
+  const {items} = servicesTotals();
+
+  svcTbody.innerHTML = "";
+  for (const s of items){
+    const tr = document.createElement("tr");
+    const statusCls = s.paid ? "ok" : "bad";
+    const statusText = s.paid ? "PAGADO" : "PENDIENTE";
+    const delBtn = s.locked ? "" : `<button type="button" class="danger" data-action="del" data-svc="${s.id}">Eliminar</button>`;
+    tr.innerHTML = `
+      <td data-label="Servicio"><input data-field="name" data-svc="${s.id}" value="${escAttr(s.name)}" ${s.locked?"readonly":""}></td>
+      <td data-label="Monto"><input data-field="amount" data-svc="${s.id}" type="number" step="0.01" min="0" value="${Number(s.amount||0)}"></td>
+      <td data-label="Estado">
+        <button type="button" class="pill ${statusCls}" data-action="toggle" data-svc="${s.id}">${statusText}</button>
+      </td>
+      <td data-label="Fecha"><input data-field="paid_date" data-svc="${s.id}" type="date" value="${escAttr(s.paid_date||"")}"></td>
+      <td data-label="Nota"><input data-field="note" data-svc="${s.id}" value="${escAttr(s.note||"")}" placeholder=""></td>
+      <td data-label="">${delBtn}</td>
+    `;
+    svcTbody.appendChild(tr);
+  }
+}
 function computeAndRender(){
   if (!state) return;
 
@@ -614,6 +770,15 @@ function computeAndRender(){
 
   missChipsEl.dataset.all = missingArr.join(", ");
   missAllEl.textContent = missingArr.length ? missingArr.join(", ") : "—";
+
+  // Servicios del mes (para que “con un click” se marque y salga en PDF)
+  const sv = servicesTotals();
+  svcTotalEl.textContent = money(sv.total);
+  svcPaidEl.textContent = money(sv.paid);
+  svcPendingEl.textContent = money(sv.pending);
+  svcPerDeptEl.textContent = money(sv.perDept);
+  renderServices();
+
 
   // Semáforo por piso (en grid para que se vea “cuadradito”)
   const floors = {1:[],2:[],3:[],4:[],5:[]};
@@ -894,6 +1059,7 @@ function exportPdf(){
     .box{border:1px solid #bbb;padding:8px;border-radius:8px;min-width:160px}
     .muted{color:#555}
     .bad{color:#b00020;font-weight:700}
+    .ok{color:#0b7a2b;font-weight:700}
     @media print{
       .no-print{display:none !important;}
       body{margin:10mm}
@@ -940,7 +1106,32 @@ function exportPdf(){
           </tr>`;
         }).join("")}
       </tbody>
+    
+    <h2 style="margin:18px 0 8px 0;color:#1F4E79">Control de pagos de servicios</h2>
+    <table>
+      <thead><tr>
+        <th>Servicio</th><th>Monto</th><th>Estado</th><th>Fecha</th><th>Nota</th>
+      </tr></thead>
+      <tbody>
+        ${(() => {
+          const items = (state.meta?.services?.items || []);
+          const safe = (s)=>String(s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+          return items.map(s=>{
+            const amt = Number(s.amount||0);
+            const st = s.paid ? "PAGADO" : "PENDIENTE";
+            const cls = s.paid ? "ok" : "bad";
+            return `<tr>
+              <td><b>${safe(s.name)}</b></td>
+              <td>${amt.toFixed(2)}</td>
+              <td class="${cls}"><b>${st}</b></td>
+              <td>${safe(s.paid_date||"")}</td>
+              <td>${safe(s.note||"")}</td>
+            </tr>`;
+          }).join("");
+        })()}
+      </tbody>
     </table>
+</table>
     <p class="muted" style="margin-top:12px">Generado: ${new Date().toLocaleString()}</p>
     <script>window.onload=()=>setTimeout(()=>window.print(),50);<\/script>
   </body></html>`;
@@ -973,6 +1164,91 @@ deadlineInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave
 feeInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
 payMediumInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
 receiverInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
+
+// Servicios
+btnAddService.addEventListener("click", ()=>{
+  if (!state) return;
+  const name = (svcNewName.value||"").trim();
+  if (!name){ showToast("Pon nombre al servicio."); return; }
+  const amount = Number(svcNewAmount.value||0);
+  const id = "s" + Math.random().toString(16).slice(2,10);
+  ensureServices(state.meta);
+  state.meta.services.items.push({id, name, amount: Number.isFinite(amount)?amount:0, paid:false, paid_date:"", note:"", locked:false});
+  svcNewName.value=""; svcNewAmount.value="";
+  computeAndRender();
+  scheduleSave();
+});
+
+btnUseSvcFee.addEventListener("click", ()=>{
+  if (!state) return;
+  const sv = servicesTotals();
+  const fee = Number(sv.perDept||0);
+  feeInp.value = fee.toFixed(2);
+  updateMetaFromInputs();
+  if (chkApplyFeeRows.checked){
+    for (const r of state.rows){
+      r.amount_due = fee;
+      // si alguien ya pagó más que el nuevo monto, lo ajustamos para evitar saldos negativos
+      if (Number(r.amount_paid||0) > fee) r.amount_paid = fee;
+    }
+  }
+  computeAndRender();
+  scheduleSave();
+  showToast("Cuota sugerida aplicada.");
+});
+
+svcTbody.addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-action]");
+  if (!btn || !state) return;
+  const id = btn.getAttribute("data-svc");
+  ensureServices(state.meta);
+  const items = state.meta.services.items;
+  const s = items.find(x=>x.id===id);
+  if (!s) return;
+
+  const act = btn.getAttribute("data-action");
+  if (act==="toggle"){
+    s.paid = !s.paid;
+    if (s.paid && !s.paid_date){
+      const d = new Date();
+      s.paid_date = d.toISOString().slice(0,10);
+    }
+    computeAndRender();
+    scheduleSave();
+    return;
+  }
+  if (act==="del"){
+    if (s.locked) return;
+    state.meta.services.items = items.filter(x=>x.id!==id);
+    computeAndRender();
+    scheduleSave();
+    return;
+  }
+});
+
+svcTbody.addEventListener("input", (e)=>{
+  const t = e.target;
+  const id = t.getAttribute("data-svc");
+  const field = t.getAttribute("data-field");
+  if (!id || !field || !state) return;
+  ensureServices(state.meta);
+  const s = state.meta.services.items.find(x=>x.id===id);
+  if (!s) return;
+
+  if (field==="amount"){
+    const n = Number(t.value);
+    s.amount = Number.isFinite(n)?n:0;
+  } else if (field==="name"){
+    if (!s.locked) s.name = t.value;
+  } else if (field==="paid_date"){
+    s.paid_date = t.value;
+  } else if (field==="note"){
+    s.note = t.value;
+  }
+  computeAndRender();
+  scheduleSave();
+});
+
 
 el("tbl").addEventListener("input", onTableInput);
 el("tbl").addEventListener("change", onTableInput);
