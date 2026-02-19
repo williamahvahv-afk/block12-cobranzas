@@ -2,475 +2,248 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Block 12 — Cobranzas (Feb–Jun 2026)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Block 12 — Control de Cobranzas (Feb–Jun 2026)</title>
   <style>
     :root{
-      --bg:#0b1020;
-      --card:#111a33;
-      --panel:#0a1430;
-      --muted:#8aa0c6;
-      --txt:#e7efff;
-      --ok:#1db954;
-      --warn:#f5c542;
-      --bad:#ff4d4d;
-      --line:rgba(255,255,255,.10);
-      --shadow:0 14px 40px rgba(0,0,0,.28);
-      --radius:16px;
-      --gap:14px;
+      --bg:#0b1020; --muted:#8aa0c6; --txt:#e7efff;
+      --ok:#1db954; --warn:#f5c542; --bad:#ff4d4d;
+      --line:rgba(255,255,255,.10); --shadow:0 14px 40px rgba(0,0,0,.30);
+      --radius:18px; --gap:14px;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
-      background:radial-gradient(1200px 600px at 20% -10%, rgba(27,58,166,.25), transparent 60%),
-                 radial-gradient(900px 520px at 100% 0%, rgba(29,185,84,.10), transparent 55%),
-                 linear-gradient(180deg,#071028,#0b1020);
-      color:var(--txt);
-    }
-    .wrap{max-width:1280px;margin:0 auto;padding:18px 14px}
-    header{
-      position:sticky;top:0;z-index:20;
-      background:rgba(11,16,32,.86);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--line);
-    }
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    h1{font-size:18px;letter-spacing:.2px;margin:0 0 6px 0}
-    .subrow{display:flex;gap:8px;flex-wrap:wrap}
-    .pill{
-      padding:7px 10px;border-radius:999px;
-      font-size:12px;border:1px solid var(--line);
-      color:var(--muted);background:rgba(255,255,255,.03)
-    }
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
-    button{
-      padding:10px 12px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(18,34,82,.85);
-      color:var(--txt);
-      cursor:pointer;
-      transition:transform .05s ease, filter .15s ease;
-      white-space:nowrap;
-    }
-    button:hover{filter:brightness(1.08)}
+    body{margin:0;background:radial-gradient(1200px 700px at 20% 0%, #132a66 0%, rgba(19,42,102,0) 60%), var(--bg); color:var(--txt); font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+    header{position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);background:rgba(11,16,32,.72);border-bottom:1px solid var(--line);}
+    .wrap{max-width:1120px;margin:0 auto;padding:14px;}
+    .topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .title{font-weight:800;letter-spacing:.2px}
+    .pills{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+    .pill{padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px}
+    .pill.ok{color:#bff5d0;border-color:rgba(29,185,84,.35);background:rgba(29,185,84,.08)}
+    .pill.bad{color:#ffd0d0;border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.06)}
+    .pill.warn{color:#fff0c2;border-color:rgba(245,197,66,.35);background:rgba(245,197,66,.07)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    button{border:1px solid rgba(255,255,255,.12);background:rgba(28,45,85,.9);color:white;padding:9px 12px;border-radius:12px;font-weight:700;cursor:pointer}
+    button.primary{background:linear-gradient(180deg, rgba(42,101,255,.95) 0%, rgba(32,80,210,.95) 100%);box-shadow:0 10px 26px rgba(0,0,0,.25);}
+    button.danger{background:rgba(176,0,32,.9)}
     button:active{transform:translateY(1px)}
-    button.primary{background:#1b3aa6;border-color:rgba(255,255,255,.18)}
-    button.danger{background:#7a1f2a}
-    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
-    select,input,textarea{
-      width:100%;
-      padding:10px 11px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(10,20,48,.92);
-      color:var(--txt);
-      outline:none;
-    }
-    input.num{max-width:120px}
-    input.date{max-width:160px}
-    input.txt{min-width:140px}
-    textarea.note{min-height:40px;resize:vertical}
-    .card{
-      background:rgba(17,26,51,.92);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:var(--radius);
-      padding:14px;
-      box-shadow:var(--shadow);
-    }
-    .stack{
-      display:flex;
-      flex-direction:column;
-      gap:var(--gap);
-      align-items:stretch;
-    }
-    .topInner{
-      display:grid;
-      grid-template-columns:repeat(12,minmax(0,1fr));
-      gap:var(--gap);
-    }
-    .topInner .col4{grid-column:span 4;}
-
-    
-    .col12{grid-column:span 12;}
-    table.svc{min-width:760px;}
-    .svcKpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0 8px 0}
-    .svcKpi{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:14px;padding:12px}
-    .svcKpi .v{font-size:22px;font-weight:900;letter-spacing:.2px}
-    .svcKpi .t{font-size:12px;color:var(--muted);margin-bottom:6px}
-    .svcActions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
-    .svcAdd{display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end}
-    @media (max-width:900px){
-      .svcKpis{grid-template-columns:repeat(2,1fr)}
-      .svcAdd{grid-template-columns:1fr 1fr}
-      .svcAdd button{grid-column:1 / -1}
-    }
-.section{
-      padding:12px;
-      border-radius:14px;
-      background:rgba(10,20,48,.55);
-      border:1px solid rgba(255,255,255,.08);
-    }
-    .section + .section{margin-top:12px}
-    .sectionTitle{
-      font-size:12px;
-      color:var(--muted);
-      letter-spacing:.3px;
-      text-transform:uppercase;
-      margin:0 0 10px 0;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .form3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-    .form2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .kpi .box{
-      background:rgba(10,20,48,.92);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;
-      padding:12px;
-      min-height:102px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    }
-    .big{font-size:22px;font-weight:800;margin-top:6px;letter-spacing:.2px}
-    .small{font-size:12px;color:var(--muted)}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    main{padding:12px 0 28px}
+    .gridTop{display:grid;grid-template-columns:1.25fr .75fr;gap:var(--gap);align-items:start}
+    .card{background:linear-gradient(180deg, rgba(17,26,51,.9) 0%, rgba(10,20,48,.85) 100%);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;}
+    .card h2{margin:0 0 10px 0;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#b9c9ff}
+    .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input,select,textarea{width:100%;padding:10px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(10,20,48,.55);color:var(--txt);outline:none}
+    textarea{min-height:44px;resize:vertical}
+    .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .kpi{background:rgba(10,20,48,.45);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:12px}
+    .kpi .k{font-size:12px;color:var(--muted)}
+    .kpi .v{font-size:24px;font-weight:900;margin-top:6px}
+    .kpi .v.small{font-size:20px}
     .muted{color:var(--muted)}
-    .btnbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btnbar > *{flex:0 0 auto}
-    .chiplist{
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      max-height:78px;
-      overflow:auto;
-      margin-top:8px;
-      padding-right:2px;
-    }
-    .chip{
-      font-size:12px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.04);
-    }
-    .rightTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    #byFloor{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:10px;
-      margin-top:10px;
-    }
-    .floorCard{
-      padding:12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(10,20,48,.92);
-      min-height:84px;
-      display:flex;
-      align-items:center;
-    }
-    .floorTitle{font-weight:800}
-    .floorPend{margin-top:6px;font-size:12px}
-    .status{font-weight:800}
-    .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
-    .divider{height:1px;background:rgba(255,255,255,.08);margin:12px 0}
-    .tableWrap{
-      margin-top:10px;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;
-      overflow:auto;
-      background:rgba(10,20,48,.55);
-    }
-    table{width:100%;border-collapse:separate;border-spacing:0;min-width:980px}
-    th,td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
-    th{
-      font-size:12px;
-      color:var(--muted);
-      text-align:left;
-      position:sticky;
-      top:0;
-      background:rgba(10,20,48,.96);
-      backdrop-filter:blur(6px);
-      z-index:2;
-    }
-    tr:last-child td{border-bottom:none}
-    .footer-note{font-size:12px;color:var(--muted);margin-top:10px}
-    .toast{
-      position:fixed;left:50%;transform:translateX(-50%);
-      bottom:18px;z-index:50;
-      background:rgba(10,20,48,.96);
-      border:1px solid rgba(255,255,255,.18);
-      padding:10px 12px;border-radius:14px;
-      display:none;
-      max-width:min(620px,92vw);
-      box-shadow:0 18px 50px rgba(0,0,0,.35);
-    }
-    .toast.show{display:block}
-    /* Responsive */
-    @media (max-width: 1180px){
-      .topInner .col4{grid-column:span 6}
-      #byFloor{grid-template-columns:repeat(2,minmax(0,1fr))}
-    }
-    @media (max-width: 980px){
-      .topInner .col4{grid-column:span 12}
-      .form3{grid-template-columns:1fr}
-      .form2{grid-template-columns:1fr}
-      #byFloor{grid-template-columns:repeat(2,minmax(0,1fr))}
-      table{min-width:0}
-    }
-    @media (max-width: 860px){
-      /* Mobile table -> cards */
-      table, thead, tbody, th, td, tr { display:block; }
-      thead{display:none}
-      .tableWrap{background:transparent;border:0}
-      tr{
-        border:1px solid rgba(255,255,255,.10);
-        border-radius:14px;
-        margin:10px 0;
-        background:rgba(10,20,48,.92);
-        overflow:hidden;
-      }
-      td{border-bottom:1px solid rgba(255,255,255,.08)}
-      td:last-child{border-bottom:none}
-      td[data-label]::before{
-        content:attr(data-label);
-        display:block;
-        font-size:12px;
-        color:var(--muted);
-        margin-bottom:4px
-      }
-      input.num,input.date{max-width:100%}
-    }
-  
-    @media (max-width: 560px){
-      #byFloor{grid-template-columns:1fr}
-    }
-
-    /* Modal (conectar a la nube) */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:99}
-    .modal.hidden{display:none}
-    .modalCard{width:min(560px,96vw);background:rgba(10,16,40,.98);border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.55);overflow:hidden}
-    .modalHead{display:flex;align-items:center;gap:10px;padding:14px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
-    .modalTitle{font-weight:800;letter-spacing:.2px}
-    .modalBody{padding:14px}
-    .modalBody input{width:100%}
-    .modalFoot{display:flex;align-items:center;gap:10px;padding:14px;border-top:1px solid rgba(255,255,255,.08)}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.12)}
-</style>
+    .tiny{font-size:12px}
+    .hr{height:1px;background:var(--line);margin:14px 0}
+    .svcTop{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-top:8px}
+    .svcBar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-top:10px}
+    .svcBar .grow{flex:1}
+    .svcTable{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+    .svcItem{display:grid;grid-template-columns:1.2fr .6fr .55fr .7fr 1.2fr .3fr;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.10)}
+    .badge{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(10,20,48,.45);font-weight:900;font-size:12px;cursor:pointer;user-select:none;text-transform:uppercase;letter-spacing:.08em}
+    .badge.ok{color:#c8ffe0;border-color:rgba(29,185,84,.35);background:rgba(29,185,84,.10)}
+    .badge.bad{color:#ffd2d2;border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.08)}
+    .badge.warn{color:#fff3c9;border-color:rgba(245,197,66,.35);background:rgba(245,197,66,.08)}
+    .bottom{margin-top:var(--gap);display:grid;grid-template-columns:1fr;gap:var(--gap)}
+    .floors{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px}
+    .floorCard{border:1px solid rgba(255,255,255,.10);background:rgba(10,20,48,.45);border-radius:16px;padding:10px;min-height:82px}
+    .floorTitle{font-weight:900}
+    .floorPend{font-size:12px;margin-top:6px;color:var(--muted);word-break:break-word}
+    .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+    .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)}
+    .tableWrap{overflow:auto;border:1px solid rgba(255,255,255,.10);background:rgba(10,20,48,.35);border-radius:16px}
+    table{width:100%;border-collapse:collapse;min-width:920px}
+    th,td{border-bottom:1px solid rgba(255,255,255,.10);padding:10px;vertical-align:top}
+    th{position:sticky;top:0;background:rgba(10,20,48,.9);z-index:3;font-size:12px;color:#b9c9ff;text-align:left}
+    td input,td textarea{background:rgba(255,255,255,.04)}
+    .mono{font-variant-numeric:tabular-nums}
+    .statusTxt{font-weight:900;letter-spacing:.06em}
+    .statusTxt.ok{color:#bff5d0} .statusTxt.bad{color:#ffb2b2} .statusTxt.warn{color:#ffe8a3}
+    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(0,0,0,.72);color:white;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:10px 14px;font-weight:800;opacity:0;pointer-events:none;transition:.2s;z-index:999;max-width:92vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .toast.show{opacity:1}
+    .smallActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .smallActions button{padding:8px 10px;border-radius:12px}
+    @media (max-width:980px){.gridTop{grid-template-columns:1fr}.svcTop{grid-template-columns:1fr 1fr}.floors{grid-template-columns:1fr 1fr}table{min-width:860px}}
+    @media (max-width:560px){.svcItem{grid-template-columns:1fr .7fr .7fr 1fr}.svcItem .note,.svcItem .del{grid-column:1/-1}}
+  </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="topbar">
-        <div>
-          <h1>Block 12 — Control de Cobranzas (Feb–Jun 2026)</h1>
-          <div class="subrow">
-            <span class="pill" id="savePill">Auto-guardado local: —</span>
-            <span class="pill" id="cloudPill">Nube: —</span>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="primary" id="btnPdf">Exportar PDF</button>
-          <button id="btnCsv">Exportar CSV</button>
+<header>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="title">Block 12 — Control de Cobranzas (Feb–Jun 2026)</div>
+        <div class="pills">
+          <span class="pill" id="savePill">Auto-guardado: —</span>
+          <span class="pill bad" id="dbPill">D1: sin llave</span>
+          <span class="pill" id="lastEdit">Última edición: —</span>
         </div>
       </div>
+      <div class="actions">
+        <button id="btnKey">Configurar llave</button>
+        <button id="btnPdf" class="primary">Exportar PDF</button>
+        <button id="btnCsv">Exportar CSV</button>
+      </div>
     </div>
-  </header>
+  </div>
+</header>
 
-  <main class="wrap">
-    <div class="stack">
-
-      <!-- Izquierda -->
-      <section class="card">
-        <div class="topInner">
-        <div class="section col4">
-          <div class="sectionTitle">Configuración del mes</div>
-          <div class="form3">
-            <div>
-              <label>Mes</label>
-              <select id="period">
-                <option value="2026-02">Febrero 2026</option>
-                <option value="2026-03">Marzo 2026</option>
-                <option value="2026-04">Abril 2026</option>
-                <option value="2026-05">Mayo 2026</option>
-                <option value="2026-06">Junio 2026</option>
-              </select>
-            </div>
-            <div>
-              <label>Fecha límite</label>
-              <input id="deadline" type="date" />
-            </div>
-            <div>
-              <label>Cuota base por dpto (S/)</label>
-              <input id="fee" type="number" step="0.01" min="0" inputmode="decimal" />
-            </div>
-          </div>
-
-          <div class="form2" style="margin-top:10px">
-            <div>
-              <label>Medio de pago (texto para mostrar)</label>
-              <input id="payMedium" placeholder="Ej: PLIN 978 515 968" />
-            </div>
-            <div>
-              <label>Recepciona</label>
-              <input id="receiver" placeholder="Ej: William Huatay Villoslada" />
-            </div>
-          </div>
-        </div>
-
-        <div class="section col4">
-          <div class="sectionTitle">Resumen del mes</div>
-          <div class="kpi">
-            <div class="box">
-              <div class="small">Recaudado</div>
-              <div class="big" id="kpiCollected">S/ 0.00</div>
-            </div>
-            <div class="box">
-              <div class="small">Pendiente</div>
-              <div class="big" id="kpiPending">S/ 0.00</div>
-            </div>
-            <div class="box">
-              <div class="small">Al día</div>
-              <div class="big" id="kpiPaid">0/20</div>
-            </div>
-            <div class="box">
-              <div class="small">Dptos pendientes</div>
-              <div class="big"><span id="kpiMissingCount">0</span><span class="small" style="margin-left:6px">dptos</span></div>
-              <div class="chiplist" id="kpiMissingChips"></div>
-              <div id="kpiMissingAll" style="display:none"></div>
-            </div>
-          </div>
-
-          <div class="btnbar" style="margin-top:12px">
-            <button id="btnMarkPaid">Marcar Pagado (hoy)</button>
-            <select id="quickUnit" style="min-width:140px;max-width:180px"><option value="">Dpto…</option></select>
-            <button id="btnCopyMissing">Copiar pendientes</button>
-            <button id="btnCopyMsg">Copiar mensaje por pisos</button>
-          </div>
-        </div>
-
-        <div class="section col12" id="servicesBox">
-          <div class="sectionTitle">Servicios y gastos del mes</div>
-
-          <div class="svcKpis">
-            <div class="svcKpi">
-              <div class="t">Total servicios</div>
-              <div class="v" id="svcTotal">S/ 0.00</div>
-            </div>
-            <div class="svcKpi">
-              <div class="t">Servicios pagados</div>
-              <div class="v" id="svcPaid">S/ 0.00</div>
-            </div>
-            <div class="svcKpi">
-              <div class="t">Servicios pendientes</div>
-              <div class="v" id="svcPending">S/ 0.00</div>
-            </div>
-            <div class="svcKpi">
-              <div class="t">Cuota sugerida por dpto (Total/20)</div>
-              <div class="v" id="svcPerDept">S/ 0.00</div>
-            </div>
-          </div>
-
-          <div class="svcActions">
-            <button id="btnUseSvcFee" class="primary" type="button">Usar cuota sugerida</button>
-            <label class="muted small" style="display:flex;align-items:center;gap:8px">
-              <input type="checkbox" id="chkApplyFeeRows" checked>
-              Aplicar a los 20 dptos (monto del mes)
-            </label>
-            <span class="muted small">Tip: con un click en <b>PAGADO/PENDIENTE</b> marcas el servicio.</span>
-          </div>
-
-          <div class="svcAdd">
-            <div>
-              <label>Nuevo servicio</label>
-              <input id="svcNewName" placeholder="Ej: Jardinería / Mantenimiento / Otros">
-            </div>
-            <div>
-              <label>Monto (S/)</label>
-              <input id="svcNewAmount" type="number" step="0.01" min="0" placeholder="0.00">
-            </div>
-            <div>
-              <button id="btnAddService" type="button">Agregar</button>
-            </div>
-          </div>
-
-          <div class="tableWrap" style="margin-top:10px">
-            <table class="svc">
-              <thead>
-                <tr>
-                  <th>Servicio</th>
-                  <th style="width:120px">Monto</th>
-                  <th style="width:120px">Estado</th>
-                  <th style="width:150px">Fecha</th>
-                  <th>Nota</th>
-                  <th style="width:70px"></th>
-                </tr>
-              </thead>
-              <tbody id="svcTbody"></tbody>
-            </table>
-          </div>
-
-          <div class="footer-note">Esto se guarda en local y también se incluye cuando exportas el PDF.</div>
-        </div>
-
-        </div>
-
-      </section>
-
-      <!-- Derecha -->
-      <section class="card">
-        <div class="rightTop">
+<main>
+  <div class="wrap">
+    <section class="gridTop">
+      <div class="card">
+        <h2>Configuración del mes</h2>
+        <div class="row">
           <div>
-            <div class="small">Semáforo por piso (4 dptos por piso)</div>
-            <div id="byFloor"></div>
+            <label>Mes</label>
+            <select id="period">
+              <option value="2026-02">Febrero 2026</option>
+              <option value="2026-03">Marzo 2026</option>
+              <option value="2026-04">Abril 2026</option>
+              <option value="2026-05">Mayo 2026</option>
+              <option value="2026-06">Junio 2026</option>
+            </select>
           </div>
-          <div style="text-align:right">
-            <div class="small">Última edición</div>
-            <div class="mono" id="lastEdit">—</div>
+          <div>
+            <label>Fecha límite</label>
+            <input id="deadline" type="date" />
+          </div>
+          <div>
+            <label>Cuota por dpto (S/)</label>
+            <input id="fee" type="number" inputmode="decimal" step="0.01" min="0" />
           </div>
         </div>
 
-        <div class="divider"></div>
+        <div class="row2" style="margin-top:10px">
+          <div>
+            <label>Medio de pago (texto para mostrar)</label>
+            <input id="payMedium" placeholder="Ej: PLIN 978 515 968" />
+          </div>
+          <div>
+            <label>Recepciona</label>
+            <input id="receiver" placeholder="Ej: William Huatay Villoslada" />
+          </div>
+        </div>
 
-        <div class="small">Detalle por departamento</div>
+        <div class="hr"></div>
+
+        <h2>Servicios y gastos del mes</h2>
+
+        <div class="svcTop">
+          <div class="kpi"><div class="k">Total servicios</div><div class="v mono" id="svcTotal">S/ 0.00</div></div>
+          <div class="kpi"><div class="k">Servicios pagados</div><div class="v mono" id="svcPaid">S/ 0.00</div></div>
+          <div class="kpi"><div class="k">Servicios pendientes</div><div class="v mono" id="svcPend">S/ 0.00</div></div>
+          <div class="kpi"><div class="k">Cuota sugerida (Total/20)</div><div class="v mono" id="svcFee">S/ 0.00</div></div>
+        </div>
+
+        <div class="svcBar">
+          <button id="btnUseFee">Usar cuota sugerida</button>
+          <label class="tiny" style="display:flex;align-items:center;gap:8px;margin:0;color:var(--muted)">
+            <input id="chkApplyAll" type="checkbox" style="width:auto;transform:scale(1.1)" checked />
+            Aplicar a los 20 dptos (monto del mes)
+          </label>
+          <div class="grow"></div>
+          <div style="min-width:220px">
+            <label class="tiny">Nuevo servicio</label>
+            <input id="newSvcName" placeholder="Ej: Jardinería" />
+          </div>
+          <div style="width:160px">
+            <label class="tiny">Monto (S/)</label>
+            <input id="newSvcAmt" type="number" step="0.01" min="0" inputmode="decimal" />
+          </div>
+          <button id="btnAddSvc">Agregar</button>
+        </div>
+
+        <div class="svcTable">
+          <div class="tiny muted" style="margin-bottom:6px">Tip: haz click en <b>PAGADO/PENDIENTE</b> para alternar.</div>
+          <div id="svcList"></div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <h2>Resumen del mes</h2>
+        <div class="kpis">
+          <div class="kpi">
+            <div class="k">Recaudado</div>
+            <div class="v mono" id="kpiCollected">S/ 0.00</div>
+          </div>
+          <div class="kpi">
+            <div class="k">Pendiente</div>
+            <div class="v mono" id="kpiPending">S/ 0.00</div>
+          </div>
+          <div class="kpi">
+            <div class="k">Al día</div>
+            <div class="v small mono" id="kpiOnTime">0/20</div>
+          </div>
+          <div class="kpi">
+            <div class="k">Dptos pendientes</div>
+            <div class="v small" id="kpiMissingCount">0 dptos</div>
+            <div class="tiny muted" id="kpiMissingList" style="margin-top:6px;max-height:120px;overflow:auto"></div>
+          </div>
+        </div>
+
+        <div class="smallActions">
+          <button id="btnMarkPaid">Marcar Pagado (hoy)</button>
+          <select id="quickUnit">
+            <option value="">Dpto…</option>
+          </select>
+          <button id="btnCopyMissing">Copiar pendientes</button>
+          <button id="btnCopyMsg">Copiar mensaje por pisos</button>
+        </div>
+
+        <div class="hr"></div>
+        <h2 class="tiny" style="margin-bottom:8px">Respaldo (por si acaso)</h2>
+        <div class="smallActions">
+          <button id="btnBackup">Backup JSON</button>
+          <button id="btnImport">Importar JSON</button>
+          <input id="fileImport" type="file" accept="application/json" style="display:none"/>
+        </div>
+        <div class="tiny muted" style="margin-top:10px">
+          Regla de oro: si algo sale raro, exporta el JSON. El condominio es duro, pero el navegador más 😄
+        </div>
+      </div>
+    </section>
+
+    <section class="bottom">
+      <div class="card">
+        <div>
+          <h2 style="margin:0 0 6px 0">Semáforo por piso (4 dptos por piso)</h2>
+          <div class="tiny muted">Rojo: pendientes, amarillo: parcial, verde: todos al día.</div>
+        </div>
+        <div class="floors" id="floors"></div>
+      </div>
+
+      <div class="card">
+        <h2>Detalle por departamento</h2>
         <div class="tableWrap">
-          <table id="tbl">
+          <table>
             <thead>
               <tr>
-                <th style="width:70px">Dpto</th>
-                <th style="width:60px">Piso</th>
-                <th style="width:120px">Monto</th>
-                <th style="width:120px">Pagado</th>
-                <th style="width:110px">Saldo</th>
-                <th style="width:160px">Fecha</th>
-                <th style="width:180px">Medio</th>
-                <th style="width:160px">Operación</th>
-                <th>Nota</th>
-                <th style="width:120px">Estado</th>
+                <th>Dpto</th><th>Piso</th><th>Monto (S/)</th><th>Pagado (S/)</th><th>Saldo</th><th>Fecha</th><th>Medio</th><th>Operación</th><th>Nota</th><th>Estado</th>
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
           </table>
         </div>
-      </section>
+      </div>
+    </section>
+  </div>
+</main>
 
-    </div>
-  </main>
-
-  <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
 <script>
+/* ====== Datos base ====== */
 const UNITS = (() => {
   const arr = [];
   for (let floor=1; floor<=5; floor++){
@@ -480,16 +253,15 @@ const UNITS = (() => {
   }
   return arr;
 })();
-
 const DEFAULTS = {
   "2026-02": { deadline: "2026-02-19", fee: 114.82, payMedium:"PLIN 978 515 968", receiver:"William Huatay Villoslada" },
   "2026-03": { deadline: "2026-03-19", fee: 0, payMedium:"", receiver:"" },
   "2026-04": { deadline: "2026-04-19", fee: 0, payMedium:"", receiver:"" },
   "2026-05": { deadline: "2026-05-19", fee: 0, payMedium:"", receiver:"" },
-  "2026-06": { deadline: "2026-06-19", fee: 0, payMedium:"", receiver:"" }
+  "2026-06": { deadline: "2026-06-19", fee: 0, payMedium:"", receiver:"" },
 };
 
-// ---- Servicios del mes (pagos de agua/luz/seguridad/limpieza + otros) ----
+/* ====== Servicios ====== */
 function defaultServices(){
   return [
     {id:"agua", name:"Agua", amount:0, paid:false, paid_date:"", note:"", locked:true},
@@ -503,632 +275,480 @@ function ensureServices(meta){
     meta.services = { items: defaultServices() };
     return;
   }
-  // Completa básicos si faltan
   const base = defaultServices();
   const byId = Object.fromEntries(meta.services.items.map(s=>[s.id,s]));
   for (const b of base){
     if (!byId[b.id]) meta.services.items.push(b);
-    else byId[b.id].locked = true; // asegura que no se borren
+    else byId[b.id].locked = true;
   }
 }
-function escAttr(s){
-  return String(s||"")
-    .replace(/&/g,"&amp;")
-    .replace(/"/g,"&quot;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;");
-}
-};
+function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
 
+/* ====== Utilidades ====== */
+const el = (id)=>document.getElementById(id);
+const toastEl = el("toast");
+const savePill = el("savePill");
+const dbPill = el("dbPill");
+const lastEditEl = el("lastEdit");
+
+const money = (n)=> `S/ ${Number(n||0).toFixed(2)}`;
+const toNum = (v)=> { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+function escapeHtml(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>toastEl.classList.remove("show"), 2200);
+}
+function keyLocal(period){ return `block12:cobranzas:${period}`; }
+function todayISO(){ const d=new Date(); const z=(x)=>String(x).padStart(2,"0"); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`; }
+function periodLabel(p){
+  const [y,m]=p.split("-");
+  const names={"02":"Febrero","03":"Marzo","04":"Abril","05":"Mayo","06":"Junio"};
+  return `${names[m]||m} ${y}`;
+}
+
+/* ====== Estado ====== */
+let state = null;
+let autosaveTimer = null;
+let cloudTimer = null;
+
+/* ====== D1 (Pages Functions) ====== */
+function getApiBase(){ return location.origin; }
+function getAppKey(){ return localStorage.getItem("block12:appkey") || ""; }
+function setAppKey(k){
+  if (!k) localStorage.removeItem("block12:appkey");
+  else localStorage.setItem("block12:appkey", k);
+  updateDbPill();
+}
+function updateDbPill(extra){
+  const key = getAppKey();
+  if (!key){
+    dbPill.className = "pill bad";
+    dbPill.textContent = "D1: sin llave";
+    return;
+  }
+  dbPill.className = "pill ok";
+  dbPill.textContent = extra ? `D1: ${extra}` : "D1: conectado";
+}
+async function cloudGet(period){
+  const key = getAppKey();
+  if (!key) return null;
+  const r = await fetch(`${getApiBase()}/api/state?period=${encodeURIComponent(period)}`, { headers: {"X-App-Key": key} });
+  if (!r.ok) throw new Error(`D1 GET ${r.status}`);
+  return await r.json();
+}
+async function cloudPut(payload){
+  const key = getAppKey();
+  if (!key) return null;
+  const r = await fetch(`${getApiBase()}/api/state`, {
+    method:"POST",
+    headers: {"Content-Type":"application/json", "X-App-Key": key},
+    body: JSON.stringify(payload)
+  });
+  if (!r.ok) throw new Error(`D1 POST ${r.status}`);
+  return await r.json();
+}
+function scheduleCloudSave(){
+  clearTimeout(cloudTimer);
+  if (!getAppKey()) return;
+  cloudTimer = setTimeout(async ()=>{
+    try{
+      const res = await cloudPut({period: state.period, json: state});
+      updateDbPill(`guardado ${new Date(res.updated_at||Date.now()).toLocaleTimeString()}`);
+    }catch(e){
+      dbPill.className = "pill warn";
+      dbPill.textContent = "D1: error (llave)";
+      console.warn(e);
+    }
+  }, 900);
+}
+
+/* ====== Local ====== */
+function loadLocal(period){
+  try{
+    const raw = localStorage.getItem(keyLocal(period));
+    if (!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+function saveLocal(){
+  try{
+    state.updated_at = Date.now();
+    localStorage.setItem(keyLocal(state.period), JSON.stringify(state));
+    savePill.textContent = `Auto-guardado: ${new Date(state.updated_at).toLocaleTimeString()}`;
+    lastEditEl.textContent = `Última edición: ${new Date(state.updated_at).toLocaleString()}`;
+  }catch(e){
+    showToast("No se pudo guardar local (storage lleno).");
+  }
+}
+function scheduleLocalSave(){
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(()=> saveLocal(), 200);
+}
+
+/* ====== Construcción ====== */
 function emptyPeriod(period){
   const def = DEFAULTS[period] || {deadline:"", fee:0, payMedium:"", receiver:""};
   return {
     period,
-    meta:{...def, services:{items: defaultServices()}},
-    rows: UNITS.map(u => ({
-      unit: u.unit,
-      floor: u.floor,
-      amount_due: Number(def.fee||0),
-      amount_paid: 0,
-      paid_date: "",
-      method: "",
-      op: "",
-      note: ""
+    meta: { ...def, services: { items: defaultServices() } },
+    rows: UNITS.map(u=>({
+      unit:u.unit, floor:u.floor,
+      amount_due:Number(def.fee||0),
+      amount_paid:0,
+      paid_date:"",
+      method:"",
+      op:"",
+      note:""
     })),
     updated_at: Date.now()
   };
 }
-
-function keyLocal(period){ return `block12:cobranzas:${period}`; }
-
-let state = null;
-let autosaveTimer = null;
-let cloudAutosyncTimer = null;
-
-const el = (id)=>document.getElementById(id);
-const periodSel = el("period");
-const deadlineInp = el("deadline");
-const feeInp = el("fee");
-const payMediumInp = el("payMedium");
-const receiverInp = el("receiver");
-const tbody = el("tbody");
-const savePill = el("savePill");
-const cloudPill = el("cloudPill");
-const lastEdit = el("lastEdit");
-const quickUnit = el("quickUnit");
-const toast = el("toast");
-// Cloud: API base = same origin, APP_KEY en localStorage (modal)
-// Servicios UI
-const svcTotalEl = el("svcTotal");
-const svcPaidEl = el("svcPaid");
-const svcPendingEl = el("svcPending");
-const svcPerDeptEl = el("svcPerDept");
-const svcTbody = el("svcTbody");
-const btnUseSvcFee = el("btnUseSvcFee");
-const chkApplyFeeRows = el("chkApplyFeeRows");
-const svcNewName = el("svcNewName");
-const svcNewAmount = el("svcNewAmount");
-const btnAddService = el("btnAddService");
-
-
-function money(n){ return `S/ ${Number(n||0).toFixed(2)}`; }
-function showToast(msg){
-  toast.textContent = msg;
-  toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"), 2200);
-}
-
-function loadLocal(period){
-  const raw = localStorage.getItem(keyLocal(period));
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
-}
-function saveLocal(){
-  if (!state) return;
-  state.updated_at = Date.now();
-  localStorage.setItem(keyLocal(state.period), JSON.stringify(state));
-  savePill.textContent = `Auto-guardado local: ${new Date(state.updated_at).toLocaleString()}`;
-  lastEdit.textContent = new Date(state.updated_at).toLocaleString();
-}
-
-function scheduleSave(){
-  clearTimeout(autosaveTimer);
-  autosaveTimer = setTimeout(()=>{
-    saveLocal();
-    computeAndRender();
-    scheduleCloudAutosync();
-  }, 250);
-}
-
-
-    function getApiBase(){
-      return (window.location.origin || "").replace(/\/+$/,"");
-    }
-    function getAppKey(){
-      return (localStorage.getItem("block12:appkey") || "").trim();
-    }
-    function setAppKey(v){
-      const val = (v||"").trim();
-      if(val) localStorage.setItem("block12:appkey", val);
-      else localStorage.removeItem("block12:appkey");
-    }
-
-    let promptedCloudKey = false;
-
-    function refreshCloudPill(text){
-      const key = getAppKey();
-      if(!key){
-        cloudPill.textContent = text || "Nube: sin clave (toca aquí)";
-        cloudPill.title = "Ingresa tu APP_KEY para guardar directo en la base de datos";
-      }else{
-        cloudPill.textContent = text || "Nube: lista";
-        cloudPill.title = "Guardado automático en D1 (haz clic para cambiar la clave)";
-      }
-    }
-
-    function openCloudModal(){
-      const modal = el("cloudModal");
-      const inp = el("appKeyModal");
-      if(!modal || !inp) return;
-      inp.value = getAppKey();
-      modal.classList.remove("hidden");
-      modal.setAttribute("aria-hidden","false");
-      setTimeout(()=>inp.focus(), 0);
-    }
-    function closeCloudModal(){
-      const modal = el("cloudModal");
-      if(!modal) return;
-      modal.classList.add("hidden");
-      modal.setAttribute("aria-hidden","true");
-    }
-
-    function bootstrapKeyFromUrl(){
-      try{
-        const url = new URL(window.location.href);
-        const k = url.searchParams.get("key") || url.searchParams.get("k") || url.searchParams.get("appkey");
-        if(k && k.trim()){
-          setAppKey(k.trim());
-          url.searchParams.delete("key"); url.searchParams.delete("k"); url.searchParams.delete("appkey");
-          window.history.replaceState({}, "", url.toString());
-        }
-      }catch(e){}
-    }
-
-    function applyLoadedState(obj){
-      state = obj && typeof obj === "object" ? obj : emptyPeriod(periodSel.value);
-      state.period = periodSel.value;
-      state.meta = state.meta || {};
-      ensureServices(state.meta);
-      // asegurar filas 101..504
-      const seen = new Set((state.rows||[]).map(r=>String(r.dpto)));
-      for (const u of UNITS){
-        if(!seen.has(String(u.dpto))){
-          state.rows.push({ dpto:String(u.dpto), piso:u.piso, monto:0, pagado:0, fecha:"", medio:"", operacion:"", nota:"" });
-        }
-      }
-      // normalizar tipos
-      state.rows = (state.rows||[]).map(r=>({
-        dpto:String(r.dpto||""),
-        piso: Number(r.piso||0) || 0,
-        monto: Number(r.monto||0) || 0,
-        pagado: Number(r.pagado||0) || 0,
-        fecha: r.fecha||"",
-        medio: r.medio||"",
-        operacion: r.operacion||"",
-        nota: r.nota||""
-      }));
-      computeAndRender();
-      saveLocal();
-    }
-
-    async function cloudPullSilent(){
-      const key = getAppKey();
-      if(!key){
-        refreshCloudPill();
-        return;
-      }
-      refreshCloudPill("Nube: cargando…");
-      try{
-        const r = await cloudGet(periodSel.value);
-        const cloudJson = r && r.json ? r.json : null;
-        const cloudTs = +(new Date((r && r.updated_at) || 0));
-        const localTs = +(new Date(state.updated_at || 0));
-        if(cloudJson && cloudTs > localTs){
-          applyLoadedState(cloudJson);
-          state.updated_at = (r && r.updated_at) || state.updated_at;
-          saveLocal();
-          refreshCloudPill("Nube: sincronizado ✓");
-        }else{
-          refreshCloudPill("Nube: al día ✓");
-        }
-      }catch(e){
-        console.error(e);
-        refreshCloudPill("Nube: error");
-      }
-    }
-async function cloudGet(period){
-  const base = getApiBase();
-  const key = getAppKey();
-  if (!base) throw new Error("Falta API base");
-  if (!key) throw new Error("Falta APP_KEY");
-  const r = await fetch(`${base}/api/state?period=${encodeURIComponent(period)}`, {
-    headers: { "X-App-Key": key }
+function ensureRows(){
+  const defFee = Number(state.meta.fee||0);
+  state.rows = UNITS.map(u=>{
+    const old = (state.rows||[]).find(x=>x.unit===u.unit);
+    return old ? {...old, unit:u.unit, floor:u.floor} : ({unit:u.unit,floor:u.floor,amount_due:defFee,amount_paid:0,paid_date:"",method:"",op:"",note:""});
   });
-  if (!r.ok) throw new Error(`Nube GET error ${r.status}`);
-  return await r.json();
-}
-
-async function cloudPut(payload){
-  const base = getApiBase();
-  const key = getAppKey();
-  if (!base) throw new Error("Falta API base");
-  if (!key) throw new Error("Falta APP_KEY");
-  const r = await fetch(`${base}/api/state`, {
-    method: "POST",
-    headers: { "Content-Type":"application/json", "X-App-Key": key },
-    body: JSON.stringify(payload)
-  });
-  if (!r.ok) throw new Error(`Nube POST error ${r.status}`);
-  return await r.json();
-}
-
-
-    function scheduleCloudAutosync(){
-      const base = getApiBase();
-      const key = getAppKey();
-      if(!key){
-        cloudPill.textContent = "Nube: sin clave (toca aquí)";
-        if(!promptedCloudKey){ promptedCloudKey = true; openCloudModal(); }
-        cloudPill.title = "Ingresa tu APP_KEY para guardar directo en la base de datos";
-        return;
-      }
-      cloudPill.title = "Guardado automático en D1";
-      clearTimeout(cloudAutosyncTimer);
-      cloudAutosyncTimer = setTimeout(async ()=>{
-        cloudPill.textContent = "Nube: guardando…";
-        try{
-          await cloudPut(periodSel.value, state);
-          cloudPill.textContent = "Nube: guardado ✓";
-        }catch(e){
-          console.error(e);
-          cloudPill.textContent = "Nube: error";
-        }
-      }, 900);
-    }
-
-
-function setInputs(){
-  deadlineInp.value = state.meta.deadline || "";
-  feeInp.value = Number(state.meta.fee || 0).toFixed(2);
-  payMediumInp.value = state.meta.payMedium || "";
-  receiverInp.value = state.meta.receiver || "";
-}
-
-function buildQuickUnits(){
-  quickUnit.innerHTML = `<option value="">Dpto…</option>` + UNITS.map(u=>`<option value="${u.unit}">${u.unit}</option>`).join("");
-}
-
-
-function servicesTotals(){
   ensureServices(state.meta);
-  const items = state.meta.services.items;
-  const toNum = (v)=>{ const n=Number(v); return Number.isFinite(n)?n:0; };
-  const total = items.reduce((a,s)=>a+Math.max(0,toNum(s.amount)),0);
-  const paid = items.reduce((a,s)=>a+(s.paid?Math.max(0,toNum(s.amount)):0),0);
-  const pending = Math.max(0,total-paid);
-  const perDept = total/20;
-  return {total, paid, pending, perDept, items};
 }
 
+/* ====== Render ====== */
+function buildQuickUnits(){
+  el("quickUnit").innerHTML = `<option value="">Dpto…</option>` + UNITS.map(u=>`<option value="${u.unit}">${u.unit}</option>`).join("");
+}
 function renderServices(){
-  if (!state) return;
-  const {items} = servicesTotals();
+  ensureServices(state.meta);
+  const list = el("svcList");
+  const items = state.meta.services.items;
 
-  svcTbody.innerHTML = "";
-  for (const s of items){
-    const tr = document.createElement("tr");
-    const statusCls = s.paid ? "ok" : "bad";
-    const statusText = s.paid ? "PAGADO" : "PENDIENTE";
-    const delBtn = s.locked ? "" : `<button type="button" class="danger" data-action="del" data-svc="${s.id}">Eliminar</button>`;
-    tr.innerHTML = `
-      <td data-label="Servicio"><input data-field="name" data-svc="${s.id}" value="${escAttr(s.name)}" ${s.locked?"readonly":""}></td>
-      <td data-label="Monto"><input data-field="amount" data-svc="${s.id}" type="number" step="0.01" min="0" value="${Number(s.amount||0)}"></td>
-      <td data-label="Estado">
-        <button type="button" class="pill ${statusCls}" data-action="toggle" data-svc="${s.id}">${statusText}</button>
-      </td>
-      <td data-label="Fecha"><input data-field="paid_date" data-svc="${s.id}" type="date" value="${escAttr(s.paid_date||"")}"></td>
-      <td data-label="Nota"><input data-field="note" data-svc="${s.id}" value="${escAttr(s.note||"")}" placeholder=""></td>
-      <td data-label="">${delBtn}</td>
+  list.innerHTML = items.map(s=>{
+    const badgeClass = s.paid ? "ok" : "bad";
+    const badgeText = s.paid ? "PAGADO" : "PENDIENTE";
+    return `
+      <div class="svcItem" data-id="${escapeHtml(s.id)}">
+        <div><b>${escapeHtml(s.name)}</b></div>
+        <div><input class="svcAmt" type="number" step="0.01" min="0" inputmode="decimal" value="${toNum(s.amount).toFixed(2)}"></div>
+        <div><span class="badge ${badgeClass} svcToggle">${badgeText}</span></div>
+        <div><input class="svcDate" type="date" value="${escapeHtml(s.paid_date||"")}"></div>
+        <div class="note"><input class="svcNote" placeholder="Nota" value="${escapeHtml(s.note||"")}"></div>
+        <div class="del">${s.locked ? "" : `<button class="danger svcDel" title="Eliminar">✕</button>`}</div>
+      </div>
     `;
-    svcTbody.appendChild(tr);
+  }).join("");
+
+  // Totales
+  let total = 0, paid = 0, pend = 0;
+  for (const s of items){
+    const a = Math.max(0, toNum(s.amount));
+    total += a;
+    if (s.paid) paid += a; else pend += a;
   }
+  el("svcTotal").textContent = money(total);
+  el("svcPaid").textContent = money(paid);
+  el("svcPend").textContent = money(pend);
+  el("svcFee").textContent = money(total/20);
+
+  // Delegación eventos
+  list.onclick = (ev)=>{
+    const row = ev.target.closest(".svcItem");
+    if (!row) return;
+    const id = row.getAttribute("data-id");
+    const svc = state.meta.services.items.find(x=>x.id===id);
+    if (!svc) return;
+
+    if (ev.target.classList.contains("svcToggle")){
+      svc.paid = !svc.paid;
+      if (svc.paid && !svc.paid_date) svc.paid_date = todayISO();
+      if (!svc.paid) svc.paid_date = "";
+      touch();
+      renderServices();
+      return;
+    }
+    if (ev.target.classList.contains("svcDel")){
+      state.meta.services.items = state.meta.services.items.filter(x=>x.id!==id);
+      touch();
+      renderServices();
+      return;
+    }
+  };
+  list.oninput = (ev)=>{
+    const row = ev.target.closest(".svcItem");
+    if (!row) return;
+    const id = row.getAttribute("data-id");
+    const svc = state.meta.services.items.find(x=>x.id===id);
+    if (!svc) return;
+
+    if (ev.target.classList.contains("svcAmt")) svc.amount = toNum(ev.target.value);
+    if (ev.target.classList.contains("svcDate")) svc.paid_date = ev.target.value || "";
+    if (ev.target.classList.contains("svcNote")) svc.note = ev.target.value || "";
+    touchDebounced();
+  };
 }
 function computeAndRender(){
   if (!state) return;
 
-  // Helpers
-  const toNum = (v)=> {
-    const n = Number(v);
-    return (Number.isFinite(n) ? n : 0);
-  };
-
+  // KPIs
   let collected = 0, pending = 0, paidCount = 0;
-
+  const pendUnits = [];
   for (const r of state.rows){
     const due = Math.max(0, toNum(r.amount_due));
     const paid = Math.max(0, toNum(r.amount_paid));
-    const saldo = Math.max(0, due - paid);
-
+    const saldo = Math.max(0, due-paid);
     collected += paid;
     pending += saldo;
-
-    if (due > 0 && saldo <= 0.009) paidCount++;
+    if (due>0 && saldo<=0.009) paidCount++;
+    else if (due>0 && saldo>0.009) pendUnits.push(r.unit);
   }
-
-  // Avoid -0.00 glitches
-  collected = Math.max(0, collected);
-  pending = Math.max(0, pending);
-
   el("kpiCollected").textContent = money(collected);
   el("kpiPending").textContent = money(pending);
-  el("kpiPaid").textContent = `${paidCount}/20`;
+  el("kpiOnTime").textContent = `${paidCount}/20`;
+  el("kpiMissingCount").textContent = `${pendUnits.length} dptos`;
+  el("kpiMissingList").textContent = pendUnits.length ? pendUnits.join(", ") : "—";
 
-  const missingArr = state.rows
-    .filter(r => toNum(r.amount_due) > 0 && Math.max(0, toNum(r.amount_due) - toNum(r.amount_paid)) > 0.009)
-    .map(r => r.unit);
+  // Semáforo
+  const floorsEl = el("floors");
+  floorsEl.innerHTML = "";
+  for (let f=1; f<=5; f++){
+    const units = UNITS.filter(u=>u.floor===f).map(u=>u.unit);
+    const rows = state.rows.filter(r=>units.includes(r.unit));
+    const dueSum = rows.reduce((a,r)=>a+Math.max(0,toNum(r.amount_due)),0);
+    const saldoSum = rows.reduce((a,r)=>a+Math.max(0,Math.max(0,toNum(r.amount_due)-toNum(r.amount_paid))),0);
+    let cls = "bad";
+    if (dueSum<=0) cls="warn";
+    else if (saldoSum<=0.01) cls="ok";
+    else if (saldoSum < dueSum) cls="warn";
 
-  // Count + chips (compact, no “lista infinita” que rompe la simetría)
-  const missCountEl = el("kpiMissingCount");
-  const missChipsEl = el("kpiMissingChips");
-  const missAllEl = el("kpiMissingAll");
-
-  missCountEl.textContent = `${missingArr.length}`;
-  missChipsEl.innerHTML = missingArr.length
-    ? missingArr.map(u => `<span class="chip">${u}</span>`).join("")
-    : `<span class="muted">—</span>`;
-
-  missChipsEl.dataset.all = missingArr.join(", ");
-  missAllEl.textContent = missingArr.length ? missingArr.join(", ") : "—";
-
-  // Servicios del mes (para que “con un click” se marque y salga en PDF)
-  const sv = servicesTotals();
-  svcTotalEl.textContent = money(sv.total);
-  svcPaidEl.textContent = money(sv.paid);
-  svcPendingEl.textContent = money(sv.pending);
-  svcPerDeptEl.textContent = money(sv.perDept);
-  renderServices();
-
-
-  // Semáforo por piso (en grid para que se vea “cuadradito”)
-  const floors = {1:[],2:[],3:[],4:[],5:[]};
-  for (const r of state.rows) floors[r.floor].push(r);
-
-  el("byFloor").innerHTML = Object.keys(floors).map(f=>{
-    const rows = floors[f];
-    const paid = rows.filter(x => toNum(x.amount_due) > 0 && Math.max(0, toNum(x.amount_due) - toNum(x.amount_paid)) <= 0.009).length;
-
-    const status = paid===4 ? "ok" : paid===3 ? "warn" : "bad";
-    const dot = paid===4 ? "🟢" : paid===3 ? "🟡" : "🔴";
-    const pend = rows
-      .filter(x => toNum(x.amount_due) > 0 && Math.max(0, toNum(x.amount_due) - toNum(x.amount_paid)) > 0.009)
-      .map(x => x.unit);
-
-    const pendText = pend.length ? pend.join(", ") : "—";
-
-    return `
-      <div class="floorCard">
-        <div class="floorLeft">
-          <div class="floorTitle"><span class="status ${status}">${dot} Piso ${f}</span> <span class="muted">(${paid}/4 al día)</span></div>
-          <div class="floorPend muted">Pendientes: ${pendText}</div>
-        </div>
-      </div>`;
-  }).join("");
+    const pend = rows.filter(r=>Math.max(0,toNum(r.amount_due)-toNum(r.amount_paid))>0.009 && toNum(r.amount_due)>0).map(r=>r.unit);
+    const card = document.createElement("div");
+    card.className = "floorCard";
+    card.innerHTML = `
+      <div class="floorTitle"><span class="dot ${cls}"></span>Piso ${f} <span class="muted tiny">(${4-pend.length}/4 al día)</span></div>
+      <div class="floorPend">Pendientes: ${pend.length?pend.join(", "):"—"}</div>
+    `;
+    floorsEl.appendChild(card);
+  }
 
   // Tabla
+  const tbody = el("tbody");
   tbody.innerHTML = "";
   for (const r of state.rows){
     const due = Math.max(0, toNum(r.amount_due));
     const paid = Math.max(0, toNum(r.amount_paid));
-    const saldo = Math.max(0, due - paid);
+    const saldo = Math.max(0, due-paid);
 
-    let st = "PENDIENTE", cls = "bad";
+    let st="PENDIENTE", cls="bad";
     if (due<=0){ st="SIN MONTO"; cls="warn"; }
     else if (saldo<=0.009){ st="PAGADO"; cls="ok"; }
     else if (paid>0){ st="PARCIAL"; cls="warn"; }
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td data-label="Dpto"><strong>${r.unit}</strong></td>
-      <td data-label="Piso">${r.floor}</td>
-      <td data-label="Monto (S/)"><input class="num" data-k="amount_due" data-u="${r.unit}" type="number" step="0.01" min="0" inputmode="decimal" value="${due.toFixed(2)}"></td>
-      <td data-label="Pagado (S/)"><input class="num" data-k="amount_paid" data-u="${r.unit}" type="number" step="0.01" min="0" inputmode="decimal" value="${paid.toFixed(2)}"></td>
-      <td data-label="Saldo"><span class="mono">${money(saldo)}</span></td>
-      <td data-label="Fecha"><input class="date" data-k="paid_date" data-u="${r.unit}" type="date" value="${r.paid_date||""}"></td>
-      <td data-label="Medio"><input class="txt" data-k="method" data-u="${r.unit}" value="${escapeHtml(r.method||"")}"></td>
-      <td data-label="Operación"><input class="txt" data-k="op" data-u="${r.unit}" value="${escapeHtml(r.op||"")}"></td>
-      <td data-label="Nota"><textarea class="note" data-k="note" data-u="${r.unit}">${escapeHtml(r.note||"")}</textarea></td>
-      <td data-label="Estado"><span class="status ${cls}">${st}</span></td>
+      <td><b>${r.unit}</b></td>
+      <td>${r.floor}</td>
+      <td><input data-k="amount_due" data-u="${r.unit}" type="number" step="0.01" min="0" inputmode="decimal" value="${due.toFixed(2)}"></td>
+      <td><input data-k="amount_paid" data-u="${r.unit}" type="number" step="0.01" min="0" inputmode="decimal" value="${paid.toFixed(2)}"></td>
+      <td><span class="mono">${money(saldo)}</span></td>
+      <td><input data-k="paid_date" data-u="${r.unit}" type="date" value="${escapeHtml(r.paid_date||"")}"></td>
+      <td><input data-k="method" data-u="${r.unit}" value="${escapeHtml(r.method||"")}"></td>
+      <td><input data-k="op" data-u="${r.unit}" value="${escapeHtml(r.op||"")}"></td>
+      <td><textarea data-k="note" data-u="${r.unit}">${escapeHtml(r.note||"")}</textarea></td>
+      <td><span class="statusTxt ${cls}">${st}</span></td>
     `;
     tbody.appendChild(tr);
   }
 }
 
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+/* ====== Cambios ====== */
+function touch(){
+  scheduleLocalSave();
+  scheduleCloudSave();
 }
-
-function updateMetaFromInputs(){
-  state.meta.deadline = deadlineInp.value;
-  state.meta.fee = Number(feeInp.value || 0);
-  state.meta.payMedium = payMediumInp.value.trim();
-  state.meta.receiver = receiverInp.value.trim();
+function touchDebounced(){
+  scheduleLocalSave();
+  clearTimeout(touchDebounced._t);
+  touchDebounced._t = setTimeout(()=> scheduleCloudSave(), 700);
 }
-
-function findRow(unit){ return state.rows.find(x=>x.unit===unit); }
-
-function onTableInput(e){
-  const t = e.target;
-  const k = t.getAttribute("data-k");
-  const u = t.getAttribute("data-u");
-  if (!k || !u) return;
-  const r = findRow(u);
-  if (!r) return;
-
-  if (k==="amount_due" || k==="amount_paid"){
-    // Sanitiza: nada de negativos ni NaN (evita recaudado raro y “-”)
-    let v = parseFloat(String(t.value ?? "").replace(",", "."));
-    if (!Number.isFinite(v) || Number.isNaN(v)) v = 0;
-    if (v < 0) v = 0;
-    r[k] = v;
-  } else {
-    r[k] = t.value;
-  }
-  scheduleSave();
+function setInputs(){
+  el("deadline").value = state.meta.deadline || "";
+  el("fee").value = toNum(state.meta.fee).toFixed(2);
+  el("payMedium").value = state.meta.payMedium || "";
+  el("receiver").value = state.meta.receiver || "";
 }
-
+function applyFeeToAllIfChecked(){
+  if (!el("chkApplyAll").checked) return;
+  const fee = Math.max(0, toNum(state.meta.fee));
+  for (const r of state.rows) r.amount_due = fee;
+}
 async function switchPeriod(period){
-  const local = loadLocal(period);
-  state = local || emptyPeriod(period);
-  state.rows = UNITS.map(u=>{
-    const old = (state.rows||[]).find(x=>x.unit===u.unit);
-    return old ? {...old, floor:u.floor, unit:u.unit} : ({unit:u.unit,floor:u.floor,amount_due:Number(state.meta.fee||0),amount_paid:0,paid_date:"",method:"",op:"",note:""});
-  });
+  state = loadLocal(period) || emptyPeriod(period);
+  state.period = period;
+  ensureRows();
   setInputs();
   buildQuickUnits();
+  updateDbPill();
+
+  if (getAppKey()){
+    try{
+      const cloud = await cloudGet(period);
+      if (cloud && cloud.json){
+        const cloudState = cloud.json;
+        const cloudTs = Number(cloudState.updated_at||0);
+        const localTs = Number(state.updated_at||0);
+        if (cloudTs > localTs){
+          state = cloudState;
+          ensureRows();
+          setInputs();
+          showToast("Cargado desde D1.");
+        }
+        updateDbPill("conectado");
+      }
+    }catch(e){
+      dbPill.className="pill warn";
+      dbPill.textContent="D1: error (llave)";
+      console.warn(e);
+    }
+  }
+
+  renderServices();
   computeAndRender();
   saveLocal();
-  cloudPill.textContent = "Nube: —";
+}
+function onMetaChange(){
+  state.meta.deadline = el("deadline").value || "";
+  state.meta.fee = toNum(el("fee").value);
+  state.meta.payMedium = el("payMedium").value || "";
+  state.meta.receiver = el("receiver").value || "";
+  applyFeeToAllIfChecked();
+  renderServices();
+  computeAndRender();
+  touch();
+}
+function onTableInput(ev){
+  const t = ev.target;
+  const unit = t.getAttribute("data-u");
+  const k = t.getAttribute("data-k");
+  if (!unit || !k) return;
+  const row = state.rows.find(r=>r.unit===unit);
+  if (!row) return;
+
+  if (k==="amount_due" || k==="amount_paid") row[k] = toNum(t.value);
+  else row[k] = t.value;
+
+  computeAndRender();
+  touchDebounced();
 }
 
+/* ====== Acciones ====== */
+function markPaidToday(){
+  const u = el("quickUnit").value;
+  if (!u) return showToast("Elige un dpto.");
+  const r = state.rows.find(x=>x.unit===u);
+  if (!r) return;
+  r.amount_paid = Math.max(0, toNum(r.amount_due));
+  r.paid_date = todayISO();
+  computeAndRender();
+  touch();
+  showToast(`${u} marcado pagado.`);
+}
+function copyMissing(){
+  const miss = state.rows.filter(r=>toNum(r.amount_due)>0 && Math.max(0,toNum(r.amount_due)-toNum(r.amount_paid))>0.009).map(r=>r.unit).join(", ") || "—";
+  navigator.clipboard?.writeText(miss);
+  showToast("Pendientes copiados.");
+}
+function copyMsgByFloors(){
+  const lines = [];
+  for (let f=1; f<=5; f++){
+    const pend = state.rows.filter(r=>r.floor===f && toNum(r.amount_due)>0 && Math.max(0,toNum(r.amount_due)-toNum(r.amount_paid))>0.009).map(r=>r.unit);
+    if (pend.length) lines.push(`Piso ${f}: ${pend.join(", ")}`);
+  }
+  const msg = lines.length ? lines.join("\n") : "Todos al día.";
+  navigator.clipboard?.writeText(msg);
+  showToast("Mensaje por pisos copiado.");
+}
+function backupJson(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `block12-cobranzas-${state.period}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importJsonFile(file){
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const obj = JSON.parse(reader.result);
+      if (!obj || !obj.period) throw new Error("JSON inválido.");
+      state = obj;
+      ensureRows();
+      setInputs();
+      renderServices();
+      computeAndRender();
+      touch();
+      showToast("Importado.");
+    }catch(e){ showToast(e.message); }
+  };
+  reader.readAsText(file);
+}
 function exportCsv(){
   const headers = ["Periodo","Dpto","Piso","Monto","Pagado","Saldo","Fecha","Medio","Operacion","Nota","Estado"];
   const lines = [headers.join(",")];
   for (const r of state.rows){
-    const due = Number(r.amount_due||0);
-    const paid = Number(r.amount_paid||0);
-    const saldo = Math.max(0, due - paid);
+    const due = toNum(r.amount_due);
+    const paid = toNum(r.amount_paid);
+    const saldo = Math.max(0, due-paid);
     let st = "PENDIENTE";
     if (due<=0) st="SIN MONTO";
     else if (saldo<=0.009) st="PAGADO";
     else if (paid>0) st="PARCIAL";
-    const row = [
-      state.period, r.unit, r.floor,
-      due.toFixed(2), paid.toFixed(2), saldo.toFixed(2),
-      r.paid_date||"", q(r.method||""), q(r.op||""), q(r.note||""), st
-    ];
+    const row = [state.period,r.unit,r.floor,due.toFixed(2),paid.toFixed(2),saldo.toFixed(2),r.paid_date||"",r.method||"",r.op||"", (r.note||"").replace(/\n/g," "), st]
+      .map(x => `"${String(x).replaceAll('"','""')}"`);
     lines.push(row.join(","));
   }
   const blob = new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `block12_cobranzas_${state.period}.csv`;
+  a.download = `block12-cobranzas-${state.period}.csv`;
   a.click();
+  URL.revokeObjectURL(a.href);
 }
-function q(s){
-  const x = String(s ?? "");
-  if (/[",\n]/.test(x)) return '"' + x.replace(/"/g,'""') + '"';
-  return x;
-}
-
-function backupJson(){
-  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `block12_cobranzas_${state.period}.json`;
-  a.click();
-  showToast("Backup JSON descargado.");
-}
-
-function importJsonFile(file){
-  const reader = new FileReader();
-  reader.onload = () => {
-    try{
-      const obj = JSON.parse(reader.result);
-      if (!obj || !obj.period || !obj.rows) throw new Error("JSON inválido");
-      state = obj;
-      periodSel.value = state.period;
-      setInputs();
-      computeAndRender();
-      saveLocal();
-      showToast("Importación OK.");
-    }catch(e){
-      showToast("No se pudo importar: " + e.message);
-    }
-  };
-  reader.readAsText(file);
-}
-
-function copyMissing(){
-  const chips = el("kpiMissingChips");
-  const all = (chips?.dataset?.all || "").trim();
-  navigator.clipboard.writeText(all);
-  showToast(all ? "Pendientes copiados." : "No hay pendientes.");
-}
-
-function periodLabel(p){
-  const [y,m]=p.split("-");
-  const map={ "02":"FEB","03":"MAR","04":"ABR","05":"MAY","06":"JUN" };
-  return `${map[m] || m} ${y}`;
-}
-
-function copyMsgByFloors(){
-  const floors = {1:[],2:[],3:[],4:[],5:[]};
-  for (const r of state.rows) floors[r.floor].push(r);
-  let msg = `📌 Control de Cobranza ${periodLabel(state.period)}\n`;
-  for (let f=1; f<=5; f++){
-    const rows = floors[f];
-    const paid = rows.filter(x=>Math.max(0,(x.amount_due||0)-(x.amount_paid||0))<=0.009 && (x.amount_due||0)>0).length;
-    const emoji = paid===4 ? "🟢" : paid===3 ? "🟡" : "🔴";
-    const pend = rows.filter(x=>Math.max(0,(x.amount_due||0)-(x.amount_paid||0))>0.009 && (x.amount_due||0)>0).map(x=>x.unit).join(", ") || "—";
-    msg += `${emoji} Piso ${f}: ${paid}/4 al día (pendientes: ${pend})\n`;
-  }
-  msg += `\nPago: ${state.meta.payMedium || "—"} — ${state.meta.receiver || ""}\n`;
-  msg += `Fecha límite: ${state.meta.deadline || "—"}\n`;
-  navigator.clipboard.writeText(msg);
-  showToast("Mensaje por pisos copiado.");
-}
-
-function copyCode(){
-  const code = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-  navigator.clipboard.writeText(code);
-  showToast("Código copiado.");
-}
-
-function restoreCode(){
-  const code = prompt("Pega aquí el código de respaldo:");
-  if (!code) return;
-  try{
-    const json = decodeURIComponent(escape(atob(code.trim())));
-    const obj = JSON.parse(json);
-    if (!obj || !obj.period || !obj.rows) throw new Error("Formato inválido");
-    state = obj;
-    periodSel.value = state.period;
-    setInputs();
-    computeAndRender();
-    saveLocal();
-    showToast("Restauración OK.");
-  }catch(e){
-    showToast("No se pudo restaurar: " + e.message);
-  }
-}
-
-function markPaidToday(){
-  const u = quickUnit.value;
-  if (!u) return showToast("Selecciona dpto.");
-  const r = findRow(u);
-  if (!r) return;
-  if ((r.amount_due||0) <= 0) return showToast("Primero define monto.");
-  r.amount_paid = Number(r.amount_due||0);
-  r.paid_date = new Date().toISOString().slice(0,10);
-  scheduleSave();
-  showToast(`${u} marcado pagado.`);
-}
-
-async function cloudPull(){
-  try{
-    const data = await cloudGet(state.period);
-    if (!data || !data.json) return showToast("Nube sin datos para este mes.");
-    const cloudTs = data.updated_at || 0;
-    const localTs = state.updated_at || 0;
-    if (cloudTs > localTs){
-      state = data.json;
-      periodSel.value = state.period;
-      setInputs();
-      computeAndRender();
-      saveLocal();
-      cloudPill.textContent = `Nube: cargado ${new Date(cloudTs).toLocaleString()}`;
-      showToast("Traído de nube.");
-    } else {
-      cloudPill.textContent = `Nube: ya estabas al día`;
-      showToast("Tu local ya era igual o más reciente.");
-    }
-  }catch(e){
-    cloudPill.textContent = `Nube: error`;
-    showToast(e.message);
-  }
-}
-
-async function cloudPush(){
-  try{
-    const res = await cloudPut({period: state.period, json: state});
-    cloudPill.textContent = `Nube: guardado ${new Date(res.updated_at).toLocaleString()}`;
-    showToast("Subido a nube.");
-  }catch(e){
-    cloudPill.textContent = `Nube: error`;
-    showToast(e.message);
-  }
-}
-
 function exportPdf(){
-  const missing = state.rows
-    .filter(r => (r.amount_due||0)>0 && Math.max(0,(r.amount_due||0)-(r.amount_paid||0))>0.009)
-    .map(r=>r.unit).join(", ") || "—";
+  const w = window.open("", "_blank");
+  if (!w) return showToast("Tu navegador bloqueó el PDF (habilita pop-ups).");
+
+  // KPIs directos
+  let collected = 0, pending = 0, paidCount = 0;
+  const pendUnitsArr = [];
+  for (const r of state.rows){
+    const due = Math.max(0, toNum(r.amount_due));
+    const paid = Math.max(0, toNum(r.amount_paid));
+    const saldo = Math.max(0, due-paid);
+    collected += paid;
+    pending += saldo;
+    if (due>0 && saldo<=0.009) paidCount++;
+    else if (due>0 && saldo>0.009) pendUnitsArr.push(r.unit);
+  }
+  const pendingUnits = pendUnitsArr.length ? pendUnitsArr.join(", ") : "—";
+
+  const servicesRows = (state.meta.services?.items || []).map(s=>{
+    const st = s.paid ? "PAGADO" : "PENDIENTE";
+    const cls = s.paid ? "ok" : "bad";
+    return `<tr>
+      <td><b>${escapeHtml(s.name)}</b></td>
+      <td style="text-align:right">${toNum(s.amount).toFixed(2)}</td>
+      <td class="${cls}"><b>${st}</b></td>
+      <td>${escapeHtml(s.paid_date||"")}</td>
+      <td>${escapeHtml(s.note||"")}</td>
+    </tr>`;
+  }).join("");
 
   const html = `
-  <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <html><head><meta charset="utf-8">
   <title>Reporte Cobranzas ${state.period}</title>
   <style>
-    body{font-family:Calibri,Arial,sans-serif;margin:24px}
+    body{font-family:Calibri,Arial,sans-serif;margin:22px}
     h1{margin:0 0 10px 0;color:#1F4E79}
     .meta{margin:6px 0 14px 0}
     table{width:100%;border-collapse:collapse;font-size:12px}
@@ -1137,277 +757,162 @@ function exportPdf(){
     .kpi{display:flex;gap:12px;margin:10px 0 14px 0;flex-wrap:wrap}
     .box{border:1px solid #bbb;padding:8px;border-radius:8px;min-width:160px}
     .muted{color:#555}
-    .bad{color:#b00020;font-weight:700}
-    .ok{color:#0b7a2b;font-weight:700}
-    @media print{
-      .no-print{display:none !important;}
-      body{margin:10mm}
-    }
-  </style>
-  </head><body>
-    <div class="no-print muted" style="margin-bottom:10px">
-      Para guardar en PDF: en la ventana de impresión elige <b>Guardar como PDF</b> (o <b>Save as PDF</b>).
-    </div>
+    .bad{color:#b00020}
+    .ok{color:#0b6b2f}
+    .warn{color:#9a6b00}
+  </style></head><body>
     <h1>Control de Cobranzas — ${periodLabel(state.period)}</h1>
     <div class="meta">
       <div><b>Fecha límite:</b> ${state.meta.deadline || "—"}</div>
-      <div><b>Cuota base:</b> ${money(state.meta.fee || 0)}</div>
-      <div><b>Pago:</b> ${(state.meta.payMedium || "—")} ${(state.meta.receiver ? "— " + state.meta.receiver : "")}</div>
+      <div><b>Cuota por dpto:</b> ${money(state.meta.fee || 0)}</div>
+      <div><b>Pago:</b> ${escapeHtml(state.meta.payMedium || "—")} ${state.meta.receiver ? "— " + escapeHtml(state.meta.receiver) : ""}</div>
+      <div class="muted"><b>Pendientes:</b> <span class="bad">${escapeHtml(pendingUnits)}</span></div>
     </div>
+
     <div class="kpi">
-      <div class="box"><div class="muted">Recaudado</div><div><b>${el("kpiCollected").textContent}</b></div></div>
-      <div class="box"><div class="muted">Pendiente</div><div><b>${el("kpiPending").textContent}</b></div></div>
-      <div class="box"><div class="muted">Al día</div><div><b>${el("kpiPaid").textContent}</b></div></div>
-      <div class="box"><div class="muted">Pendientes</div><div><b class="bad">${missing}</b></div></div>
+      <div class="box"><div class="muted">Recaudado</div><div><b>${money(collected)}</b></div></div>
+      <div class="box"><div class="muted">Pendiente</div><div><b class="bad">${money(pending)}</b></div></div>
+      <div class="box"><div class="muted">Al día</div><div><b>${paidCount}/20</b></div></div>
+      <div class="box"><div class="muted">Dptos pendientes</div><div><b class="bad">${pendUnitsArr.length} dptos</b></div></div>
     </div>
+
+    <h3 style="margin:14px 0 6px 0">Detalle por departamento</h3>
     <table>
       <thead><tr>
         <th>Dpto</th><th>Piso</th><th>Monto</th><th>Pagado</th><th>Saldo</th><th>Fecha</th><th>Medio</th><th>Operación</th><th>Nota</th><th>Estado</th>
       </tr></thead>
       <tbody>
         ${state.rows.map(r=>{
-          const due = Number(r.amount_due||0);
-          const paid = Number(r.amount_paid||0);
+          const due = toNum(r.amount_due);
+          const paid = toNum(r.amount_paid);
           const saldo = Math.max(0, due-paid);
-          const st = saldo<=0.009 ? "AL DÍA" : (paid>0.009 ? "PARCIAL" : "PENDIENTE");
-          const safe = (s)=>String(s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+          let st="PENDIENTE", cls="bad";
+          if (due<=0){ st="SIN MONTO"; cls="warn"; }
+          else if (saldo<=0.009){ st="PAGADO"; cls="ok"; }
+          else if (paid>0){ st="PARCIAL"; cls="warn"; }
           return `<tr>
             <td><b>${r.unit}</b></td>
             <td>${r.floor}</td>
-            <td>${due.toFixed(2)}</td>
-            <td>${paid.toFixed(2)}</td>
-            <td class="${saldo>0.009?'bad':''}">${saldo.toFixed(2)}</td>
-            <td>${r.paid_date||""}</td>
-            <td>${safe(r.method)}</td>
-            <td>${safe(r.op)}</td>
-            <td>${safe(r.note)}</td>
-            <td class="${st==='AL DÍA'?'':'bad'}"><b>${st}</b></td>
+            <td style="text-align:right">${due.toFixed(2)}</td>
+            <td style="text-align:right">${paid.toFixed(2)}</td>
+            <td style="text-align:right">${saldo.toFixed(2)}</td>
+            <td>${escapeHtml(r.paid_date||"")}</td>
+            <td>${escapeHtml(r.method||"")}</td>
+            <td>${escapeHtml(r.op||"")}</td>
+            <td>${escapeHtml(r.note||"")}</td>
+            <td class="${cls}"><b>${st}</b></td>
           </tr>`;
         }).join("")}
       </tbody>
-    
-    <h2 style="margin:18px 0 8px 0;color:#1F4E79">Control de pagos de servicios</h2>
-    <table>
-      <thead><tr>
-        <th>Servicio</th><th>Monto</th><th>Estado</th><th>Fecha</th><th>Nota</th>
-      </tr></thead>
-      <tbody>
-        ${(() => {
-          const items = (state.meta?.services?.items || []);
-          const safe = (s)=>String(s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-          return items.map(s=>{
-            const amt = Number(s.amount||0);
-            const st = s.paid ? "PAGADO" : "PENDIENTE";
-            const cls = s.paid ? "ok" : "bad";
-            return `<tr>
-              <td><b>${safe(s.name)}</b></td>
-              <td>${amt.toFixed(2)}</td>
-              <td class="${cls}"><b>${st}</b></td>
-              <td>${safe(s.paid_date||"")}</td>
-              <td>${safe(s.note||"")}</td>
-            </tr>`;
-          }).join("");
-        })()}
-      </tbody>
     </table>
-</table>
+
+    <h3 style="margin:14px 0 6px 0">Control de pagos de servicios</h3>
+    <table>
+      <thead><tr><th>Servicio</th><th>Monto</th><th>Estado</th><th>Fecha</th><th>Nota</th></tr></thead>
+      <tbody>${servicesRows || `<tr><td colspan="5" class="muted">Sin servicios registrados.</td></tr>`}</tbody>
+    </table>
+
     <p class="muted" style="margin-top:12px">Generado: ${new Date().toLocaleString()}</p>
-    <script>window.onload=()=>setTimeout(()=>window.print(),50);<\/script>
   </body></html>`;
-
-  // Intento 1: abrir pestaña nueva e imprimir
-  let w = null;
-  try { w = window.open("", "_blank"); } catch(e) { w = null; }
-
-  if(!w){
-    // Fallback: algunos navegadores (o navegadores dentro de apps) bloquean pop-ups
-    const blob = new Blob([html], {type:"text/html"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.target = "_blank";
-    a.rel = "noopener";
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(url), 15000);
-    alert("No se pudo abrir la ventana de impresión (pop-up bloqueado). Se intentó abrir una vista de impresión en otra pestaña. Si no aparece, abre la app en Chrome/Safari (no dentro de WhatsApp/Facebook) y habilita ventanas emergentes.");
-    return;
-  }
 
   w.document.open();
   w.document.write(html);
   w.document.close();
+  setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 250);
+}
+async function configureKey(){
+  const current = getAppKey();
+  const k = prompt("Pega tu APP_KEY para guardar/leer en D1 (se guarda en este navegador).", current || "");
+  if (k === null) return;
+  const kk = String(k).trim();
+  setAppKey(kk);
+
+  if (!kk){
+    showToast("Llave quitada. Se guardará solo local.");
+    return;
+  }
+  try{
+    const got = await cloudGet(state?.period || el("period").value);
+    updateDbPill("conectado");
+    showToast("D1 conectado.");
+    if (got && got.json){
+      const cloudTs = Number(got.json.updated_at||0);
+      const localTs = Number(state?.updated_at||0);
+      if (cloudTs > localTs){
+        state = got.json;
+        ensureRows();
+        setInputs();
+        renderServices();
+        computeAndRender();
+        saveLocal();
+        showToast("Cargado desde D1.");
+      }
+    }
+  }catch(e){
+    dbPill.className="pill warn";
+    dbPill.textContent="D1: llave inválida";
+    showToast("No conectó. Revisa APP_KEY.");
+    console.warn(e);
+  }
 }
 
-periodSel.addEventListener("change", ()=>{ switchPeriod(periodSel.value); cloudPullSilent(); });
-deadlineInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
-feeInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
-payMediumInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
-receiverInp.addEventListener("input", ()=>{ updateMetaFromInputs(); scheduleSave(); });
+/* ====== Eventos ====== */
+function wire(){
+  el("period").addEventListener("change", ()=> switchPeriod(el("period").value));
+  el("deadline").addEventListener("change", onMetaChange);
+  el("fee").addEventListener("input", onMetaChange);
+  el("payMedium").addEventListener("input", onMetaChange);
+  el("receiver").addEventListener("input", onMetaChange);
 
-// Servicios
-btnAddService.addEventListener("click", ()=>{
-  if (!state) return;
-  const name = (svcNewName.value||"").trim();
-  if (!name){ showToast("Pon nombre al servicio."); return; }
-  const amount = Number(svcNewAmount.value||0);
-  const id = "s" + Math.random().toString(16).slice(2,10);
-  ensureServices(state.meta);
-  state.meta.services.items.push({id, name, amount: Number.isFinite(amount)?amount:0, paid:false, paid_date:"", note:"", locked:false});
-  svcNewName.value=""; svcNewAmount.value="";
-  computeAndRender();
-  scheduleSave();
-});
+  el("tbody").addEventListener("input", onTableInput);
+  el("tbody").addEventListener("change", onTableInput);
 
-btnUseSvcFee.addEventListener("click", ()=>{
-  if (!state) return;
-  const sv = servicesTotals();
-  const fee = Number(sv.perDept||0);
-  feeInp.value = fee.toFixed(2);
-  updateMetaFromInputs();
-  if (chkApplyFeeRows.checked){
-    for (const r of state.rows){
-      r.amount_due = fee;
-      // si alguien ya pagó más que el nuevo monto, lo ajustamos para evitar saldos negativos
-      if (Number(r.amount_paid||0) > fee) r.amount_paid = fee;
-    }
-  }
-  computeAndRender();
-  scheduleSave();
-  showToast("Cuota sugerida aplicada.");
-});
+  el("btnPdf").addEventListener("click", exportPdf);
+  el("btnCsv").addEventListener("click", exportCsv);
 
-svcTbody.addEventListener("click", (e)=>{
-  const btn = e.target.closest("[data-action]");
-  if (!btn || !state) return;
-  const id = btn.getAttribute("data-svc");
-  ensureServices(state.meta);
-  const items = state.meta.services.items;
-  const s = items.find(x=>x.id===id);
-  if (!s) return;
+  el("btnBackup").addEventListener("click", backupJson);
+  el("btnImport").addEventListener("click", ()=> el("fileImport").click());
+  el("fileImport").addEventListener("change", (e)=> e.target.files?.[0] && importJsonFile(e.target.files[0]));
 
-  const act = btn.getAttribute("data-action");
-  if (act==="toggle"){
-    s.paid = !s.paid;
-    if (s.paid && !s.paid_date){
-      const d = new Date();
-      s.paid_date = d.toISOString().slice(0,10);
-    }
+  el("btnCopyMissing").addEventListener("click", copyMissing);
+  el("btnCopyMsg").addEventListener("click", copyMsgByFloors);
+  el("btnMarkPaid").addEventListener("click", markPaidToday);
+
+  el("btnUseFee").addEventListener("click", ()=>{
+    const items = state.meta.services.items || [];
+    const total = items.reduce((a,s)=>a+Math.max(0,toNum(s.amount)),0);
+    const fee = total/20;
+    state.meta.fee = fee;
+    el("fee").value = fee.toFixed(2);
+    applyFeeToAllIfChecked();
     computeAndRender();
-    scheduleSave();
-    return;
-  }
-  if (act==="del"){
-    if (s.locked) return;
-    state.meta.services.items = items.filter(x=>x.id!==id);
-    computeAndRender();
-    scheduleSave();
-    return;
-  }
-});
+    touch();
+    showToast("Cuota aplicada.");
+  });
 
-svcTbody.addEventListener("input", (e)=>{
-  const t = e.target;
-  const id = t.getAttribute("data-svc");
-  const field = t.getAttribute("data-field");
-  if (!id || !field || !state) return;
-  ensureServices(state.meta);
-  const s = state.meta.services.items.find(x=>x.id===id);
-  if (!s) return;
+  el("btnAddSvc").addEventListener("click", ()=>{
+    const name = (el("newSvcName").value||"").trim();
+    const amt = toNum(el("newSvcAmt").value);
+    if (!name) return showToast("Escribe el nombre del servicio.");
+    state.meta.services.items.push({id: uid(), name, amount: amt, paid:false, paid_date:"", note:"", locked:false});
+    el("newSvcName").value = "";
+    el("newSvcAmt").value = "";
+    renderServices();
+    touch();
+    showToast("Servicio agregado.");
+  });
 
-  if (field==="amount"){
-    const n = Number(t.value);
-    s.amount = Number.isFinite(n)?n:0;
-  } else if (field==="name"){
-    if (!s.locked) s.name = t.value;
-  } else if (field==="paid_date"){
-    s.paid_date = t.value;
-  } else if (field==="note"){
-    s.note = t.value;
-  }
-  computeAndRender();
-  scheduleSave();
-});
+  el("btnKey").addEventListener("click", configureKey);
+}
 
-
-el("tbl").addEventListener("input", onTableInput);
-el("tbl").addEventListener("change", onTableInput);
-
-el("btnPdf").addEventListener("click", exportPdf);
-el("btnCsv").addEventListener("click", exportCsv);
-el("btnBackup")?.addEventListener("click", backupJson);
-el("btnImport")?.addEventListener("click", ()=> el("fileImport").click());
-el("fileImport")?.addEventListener("change", (e)=> e.target.files?.[0] && importJsonFile(e.target.files[0]));
-el("btnCopyMissing").addEventListener("click", copyMissing);
-el("btnCopyMsg").addEventListener("click", copyMsgByFloors);
-el("btnCopyCode")?.addEventListener("click", copyCode);
-el("btnRestoreCode")?.addEventListener("click", restoreCode);
-el("btnMarkPaid").addEventListener("click", markPaidToday);
-
-
+/* ====== Init ====== */
 (async function init(){
+  wire();
   buildQuickUnits();
-  // Nube: configuración mínima (sin panel)
-    bootstrapKeyFromUrl();
-    refreshCloudPill();
-    cloudPill.style.cursor = "pointer";
-    cloudPill.addEventListener("click", openCloudModal);
-
-    el("btnCloseCloudModal")?.addEventListener("click", closeCloudModal);
-    el("btnCancelCloud")?.addEventListener("click", closeCloudModal);
-    el("btnSaveKey")?.addEventListener("click", ()=>{
-      const v = (el("appKeyModal")?.value || "").trim();
-      if(!v){ alert("Pega tu APP_KEY."); return; }
-      setAppKey(v);
-      closeCloudModal();
-      refreshCloudPill("Nube: lista");
-      cloudPullSilent();
-    });
-    el("btnForgetKey")?.addEventListener("click", ()=>{
-      if(confirm("¿Seguro? Se eliminará la APP_KEY guardada en este dispositivo.")){
-        setAppKey("");
-        closeCloudModal();
-        refreshCloudPill();
-      }
-    });
-
-    // cerrar modal al hacer click fuera
-    el("cloudModal")?.addEventListener("click", (ev)=>{
-      if(ev.target && ev.target.id === "cloudModal") closeCloudModal();
-    });
-    document.addEventListener("keydown", (ev)=>{
-      if(ev.key === "Escape") closeCloudModal();
-    });
-
-switchPeriod(periodSel.value);
-  showToast("Listo. Auto-guardado local activo.");
+  updateDbPill();
+  await switchPeriod(el("period").value);
+  showToast("Listo. 20 dptos cargados.");
 })();
 </script>
-
-  <!-- Modal: Conectar a la nube (APP_KEY) -->
-  <div id="cloudModal" class="modal hidden" aria-hidden="true">
-    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="cloudModalTitle">
-      <div class="modalHead">
-        <div class="modalTitle" id="cloudModalTitle">Conectar a la nube</div>
-        <button class="btn ghost" id="btnCloseCloudModal" type="button" title="Cerrar">✕</button>
-      </div>
-      <div class="modalBody">
-        <div class="muted" style="margin-bottom:10px">
-          Para guardar directo en la base de datos (D1), ingresa tu clave <b>APP_KEY</b> una sola vez en este equipo.
-          <br>Tip: si cambias de celular/PC, solo vuelves a pegarla.
-        </div>
-        <label class="label">Clave de nube (APP_KEY)</label>
-        <input id="appKeyModal" type="password" placeholder="Pega tu APP_KEY" autocomplete="off" />
-        <div class="muted" style="margin-top:8px">
-          Nota: la clave se guarda <b>solo en este dispositivo</b> (localStorage). Si no quieres eso, usa “Olvidar clave” al terminar.
-        </div>
-      </div>
-      <div class="modalFoot">
-        <button class="btn" id="btnForgetKey" type="button">Olvidar clave</button>
-        <div style="flex:1"></div>
-        <button class="btn" id="btnCancelCloud" type="button">Cancelar</button>
-        <button class="btn primary" id="btnSaveKey" type="button">Guardar</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
